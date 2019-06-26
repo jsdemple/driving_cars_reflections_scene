@@ -1,0 +1,43 @@
+Joey Demple 5229 - hw3
+
+SPORTS CAR LIGHTING AND TEXTURE SCENE
+Two sportscars modeled after the Ferrari Testarossa pass one another on a road with the sea and mountains in the background. This scene uses textures for almost every surface. I did not see any reason to put a texture on the roof of the car or the yellow lines on the pavement. Textures which have been borrowed (under fair use) are given attribution in the Acknowledgements section. All textures for the car body were drawn by me by hand. The windsheilds and windows use a subtle glass texture. The background is a sky cube showcasing a sea and mountain background. My next steps would include adding details to the car, some animation like wheels spinning while the car moves, and storefronts or buildings on one or both sides of the road. Adding reflectivity to the car's surfaces or having a highly reflective glass office building on one side of the road would be great.
+
+COMPILE
+run: `make -f makefile`
+
+OPERATE
+ *  +/-        Increase/decrease texture tiling repetition on the ground
+ *  l          Toggle lighting on/off
+ *  m          Toggles texture mode modulate/replace
+ *  a/A        decrease/increase ambient light
+ *  d/D        decrease/increase diffuse light
+ *  s/S        decrease/increase specular light
+ *  e/E        decrease/increase emitted light
+ *  n/N        Decrease/increase shininess
+ *  []         Lower/rise light
+ *  x          Toggle axes
+ *  arrows     Change view angle
+ *  PgDn/PgUp  Zoom in and out
+ *  0          Reset view angle
+ *  ESC        Exit
+
+TIME TO COMPLETE
+This took me roughly 16 hours
+
+ACKNOWLEDGEMENTS
+- asphalt texture from https://www.123rf.com/photo_97376423_asphalt-background-asphalt-texture-black-road-surface-.html
+- sky map from https://learnopengl.com/Advanced-OpenGL/Cubemaps
+- sidewalk texture from http://ixiqi.co/image
+- car underside texture from https://opengameart.org/node/10581
+- glass texture from https://www.pngkey.com/detail/u2q8y3o0a9y3i1r5_transparent-glass-texture-png-index-of-images-pattern/
+- tread texture from https://www.michelintruck.com/tires-and-retreads/selector/#!/info/xty2
+- wheel texture from https://www.schoolphotoproject.com/cars-motorbikes/car-tire-photo2.html
+- building0 from http://www.passingloop.com/?p=410
+- building1 from http://softwaremonster.info/?w=dryvit+stores+near
+- building2 from http://texturelib.com/#!/category/?path=/Textures/buildings/buildings
+- building3 from https://downloadtexture.com/textures-of-facades-of-office-buildings.html
+
+USEFUL FOR ME TO REMEMBER
+- Command to reformat as 24 bit pixels instead of 32 on BMP files: convert asphalt.bmp -type truecolor asphalt.bmp
+
