@@ -26,11 +26,11 @@ int mode=0;       //  Texture mode
 int ntex=0;       //  Cube faces
 int axes=0;       //  Display axes
 int th=0;         //  Azimuth of view angle
-int ph=20;         //  Elevation of view angle
+int ph=10;         //  Elevation of view angle
 int light=1;      //  Lighting
 int rep=10;        //  Repitition
 double asp=1;     //  Aspect ratio
-double dim=4.1;   //  Size of world  1.3
+double dim=3.0;   //  Size of world  1.3
 const double PI = 3.1415927;
 // Light values
 int emission  =   0;  // Emission intensity (%)
@@ -440,7 +440,6 @@ static void car_with_reflection(double x, double y, double z,
    car(x,y,z, dx,-dy,dz, th, tire_rotation, paint_R,paint_G,paint_B);  //  reflection of car
 }
 
-
 /*
  *  Draw sidewalk
  *     at (x,y,z)
@@ -448,15 +447,13 @@ static void car_with_reflection(double x, double y, double z,
  *     rotated th about the y axis
  *     texture repeater variable
  */
-static void sidewalk(double x,double y,double z,
-                 double dx,double dy,
+static void sidewalk(double x, double y, double z,
                  double th,
 		 double rep)
 {
-   //  Default Road Dimensions
-   double roadLen=4;
-   double roadWidth=1.3;
-   double curbHeight=0.03;
+   //  Default sidewalk Dimensions
+   double sidewalkLen=12;
+   double sidewalkWidth=10;
 
    //  Draw Sidewalk
    //  Set specular color to white
@@ -470,96 +467,29 @@ static void sidewalk(double x,double y,double z,
    glEnable(GL_POLYGON_OFFSET_FILL);
    glPolygonOffset(1,1);
    //  Offset, scale and rotate
-   glTranslated(x,y+curbHeight,z);
-   glRotated(90,1,0,0);
+   glTranslated(x,y,z);
    glRotated(th,0,1,0);
-   glScaled(dx,dy,1);
    //  Enable textures
    glEnable(GL_TEXTURE_2D);
-   glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,mode?GL_REPLACE:GL_MODULATE);
    glColor3f(1,1,1);
    glBindTexture(GL_TEXTURE_2D,texture[1]);
-   //  Draw road
+   //  Draw sidewalk
    glColor3f(1,1,1);
-   if (ntex) glBindTexture(GL_TEXTURE_2D,texture[1]);
+   glBindTexture(GL_TEXTURE_2D,texture[1]);
    glBegin(GL_QUADS);
    glNormal3f( 0,+1, 0);
-   glTexCoord2f(0,  0);   glVertex2f(-roadLen,-roadWidth);
-   glTexCoord2f(2*rep,0);   glVertex2f(+roadLen,-roadWidth);
-   glTexCoord2f(2*rep,rep); glVertex2f(+roadLen,+roadWidth);
-   glTexCoord2f(0,  rep); glVertex2f(-roadLen,+roadWidth);
+   glTexCoord2f(0,  0);     glVertex2f(-sidewalkLen/2.0,-sidewalkWidth/2.0);
+   glTexCoord2f(2*rep,0);   glVertex2f(+sidewalkLen/2.0,-sidewalkWidth/2.0);
+   glTexCoord2f(2*rep,rep); glVertex2f(+sidewalkLen/2.0,+sidewalkWidth/2.0);
+   glTexCoord2f(0,  rep);   glVertex2f(-sidewalkLen/2.0,+sidewalkWidth/2.0);
    glEnd();
    //  Undo transformations and textures
    glDisable(GL_POLYGON_OFFSET_FILL);
    glPopMatrix();
    glDisable(GL_TEXTURE_2D);
 
-   //  Draw Curb
-   //  Set specular color to white
-   glMaterialf(GL_FRONT_AND_BACK,GL_SHININESS,shiny);
-   glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,white);
-   glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,Emission);
-   //  Save transformation
-   glPushMatrix();
-   glEnable(GL_POLYGON_OFFSET_FILL);
-   glPolygonOffset(1,1);
-   //  Offset, scale and rotate
-   glTranslated(x,y,z-roadWidth);
-   glRotated(th,0,1,0);
-   glScaled(dx,dy,1);
-   //  Enable textures
-   glEnable(GL_TEXTURE_2D);
-   glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,mode?GL_REPLACE:GL_MODULATE);
-   glColor3f(1,1,1);
-   glBindTexture(GL_TEXTURE_2D,texture[1]);
-   //  Draw road
-   glColor3f(1,1,1);
-   if (ntex) glBindTexture(GL_TEXTURE_2D,texture[1]);
-   glBegin(GL_QUADS);
-   glNormal3f( 0,0,+1);
-   glTexCoord2f(0,  0);   glVertex2f(-roadLen,-curbHeight);
-   glTexCoord2f(2*rep,0);   glVertex2f(+roadLen,-curbHeight);
-   glTexCoord2f(2*rep,rep); glVertex2f(+roadLen,+curbHeight);
-   glTexCoord2f(0,  rep); glVertex2f(-roadLen,+curbHeight);
-   glEnd();
-   //  Undo transformations and textures
-   glDisable(GL_POLYGON_OFFSET_FILL);
-   glPopMatrix();
-   glDisable(GL_TEXTURE_2D);
-
-   //  Draw Curb
-   //  Set specular color to white
-   glMaterialf(GL_FRONT_AND_BACK,GL_SHININESS,shiny);
-   glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,white);
-   glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,Emission);
-   //  Save transformation
-   glPushMatrix();
-   glEnable(GL_POLYGON_OFFSET_FILL);
-   glPolygonOffset(1,1);
-   //  Offset, scale and rotate
-   glTranslated(x,y,z+roadWidth);
-   glRotated(th,0,1,0);
-   glScaled(dx,dy,1);
-   //  Enable textures
-   glEnable(GL_TEXTURE_2D);
-   glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,mode?GL_REPLACE:GL_MODULATE);
-   glColor3f(1,1,1);
-   glBindTexture(GL_TEXTURE_2D,texture[1]);
-   //  Draw road
-   glColor3f(1,1,1);
-   if (ntex) glBindTexture(GL_TEXTURE_2D,texture[1]);
-   glBegin(GL_QUADS);
-   glNormal3f( 0,0,+1);
-   glTexCoord2f(0,  0);   glVertex2f(-roadLen,-curbHeight);
-   glTexCoord2f(2*rep,0);   glVertex2f(+roadLen,-curbHeight);
-   glTexCoord2f(2*rep,rep); glVertex2f(+roadLen,+curbHeight);
-   glTexCoord2f(0,  rep); glVertex2f(-roadLen,+curbHeight);
-   glEnd();
-   //  Undo transformations and textures
-   glDisable(GL_POLYGON_OFFSET_FILL);
-   glPopMatrix();
-   glDisable(GL_TEXTURE_2D);
 }
+
 
 /*
  *  Draw a 2D road
@@ -574,23 +504,28 @@ static void road(double x,double y,double z,
 		 double rep)
 {
    //  Default Road Dimensions
-   double roadLen=4;
-   double roadWidth=1.3;
+   double roadLen=14;
+   double roadWidth=2;
    //  Set specular color to white
    float white[] = {1,1,1,1};
    float Emission[]  = {0.0,0.0,0.01*emission,1.0};
    glMaterialf(GL_FRONT_AND_BACK,GL_SHININESS,shiny);
    glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,white);
    glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,Emission);
+   glTranslated(x,y,z);
+   glRotated(90,1,0,0);
+   glRotated(th,0,1,0);
+   glScaled(dx,dy,1);
+
    //  Save transformation
    glPushMatrix();
    glEnable(GL_POLYGON_OFFSET_FILL);
    glPolygonOffset(1,1);
    //  Offset, scale and rotate
-   glTranslated(x,y,z);
+   /*glTranslated(x,y,z);
    glRotated(90,1,0,0);
    glRotated(th,0,1,0);
-   glScaled(dx,dy,1);
+   glScaled(dx,dy,1);*/
    //  Enable textures
    glEnable(GL_TEXTURE_2D);
    glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,mode?GL_REPLACE:GL_MODULATE);
@@ -601,41 +536,91 @@ static void road(double x,double y,double z,
    if (ntex) glBindTexture(GL_TEXTURE_2D,texture[0]);
    glBegin(GL_QUADS);
    glNormal3f( 0,+1, 0);
-   glTexCoord2f(0,  0);   glVertex2f(-roadLen,-roadWidth);
-   glTexCoord2f(2*rep,0);   glVertex2f(+roadLen,-roadWidth);
-   glTexCoord2f(2*rep,rep); glVertex2f(+roadLen,+roadWidth);
-   glTexCoord2f(0,  rep); glVertex2f(-roadLen,+roadWidth);
+   glTexCoord2f(0,  0);   glVertex2f(-roadLen/2.0,-roadWidth/2.0);
+   glTexCoord2f(2*rep,0);   glVertex2f(+roadLen/2.0,-roadWidth/2.0);
+   glTexCoord2f(2*rep,rep); glVertex2f(+roadLen/2.0,+roadWidth/2.0);
+   glTexCoord2f(0,  rep); glVertex2f(-roadLen/2.0,+roadWidth/2.0);
    glEnd();
    //  Undo transformations and textures
    glDisable(GL_POLYGON_OFFSET_FILL);
-   glPopMatrix();
+   //glPopMatrix();
    glDisable(GL_TEXTURE_2D);
    //  Draw Yellow lines
-   glPushMatrix();
+   //glPushMatrix();
    glColor3f(0.9,0.9,0);
    glTranslated(x,y,z-0.03);
-   glRotated(90,1,0,0);
-   glRotated(th,1,0,0);
-   glScaled(dx,dy,1);
+   //glRotated(90,1,0,0);
+   //glRotated(th,1,0,0);
+   //glScaled(dx,dy,1);
    glBegin(GL_QUADS);
-   glVertex2f(+roadLen,roadWidth*+0.01);
-   glVertex2f(-roadLen,roadWidth*+0.01);
-   glVertex2f(-roadLen,roadWidth*-0.01);
-   glVertex2f(+roadLen,roadWidth*-0.01);
+   glVertex2f(+roadLen/2.0,roadWidth*+0.01/2.0);
+   glVertex2f(-roadLen/2.0,roadWidth*+0.01/2.0);
+   glVertex2f(-roadLen/2.0,roadWidth*-0.01/2.0);
+   glVertex2f(+roadLen/2.0,roadWidth*-0.01/2.0);
    glEnd();
-   glPopMatrix();
-   glPushMatrix();
+   //glPopMatrix();
+   //glPushMatrix();
    glColor3f(0.9,0.9,0);
    glTranslated(x,y,z+0.03);
-   glRotated(90,1,0,0);
-   glRotated(th,1,0,0);
-   glScaled(dx,dy,1);
+   //glRotated(90,1,0,0);
+   //glRotated(th,1,0,0);
+   //glScaled(dx,dy,1);
    glBegin(GL_QUADS);
-   glVertex2f(+roadLen,roadWidth*+0.01);
-   glVertex2f(-roadLen,roadWidth*+0.01);
-   glVertex2f(-roadLen,roadWidth*-0.01);
-   glVertex2f(+roadLen,roadWidth*-0.01);
+   glVertex2f(+roadLen/2.0,roadWidth*+0.01/2.0);
+   glVertex2f(-roadLen/2.0,roadWidth*+0.01/2.0);
+   glVertex2f(-roadLen/2.0,roadWidth*-0.01/2.0);
+   glVertex2f(+roadLen/2.0,roadWidth*-0.01/2.0);
    glEnd();
+   glPopMatrix();
+ }
+
+/*
+ *  Draw a 2D road
+ *     at (x,y,z)
+ *     dimensions (dx,dy)
+ *     rotated th about the y axis
+ *     texture repeater variable
+ */
+static void crossroad(double x,double y,double z,
+                 double dx,double dy,
+                 double th,
+		 double rep)
+{
+   //  Default Road Dimensions
+   double roadLen=10;
+   double roadWidth=2;
+   //  Set specular color to white
+   float white[] = {1,1,1,1};
+   float Emission[]  = {0.0,0.0,0.01*emission,1.0};
+   glMaterialf(GL_FRONT_AND_BACK,GL_SHININESS,shiny);
+   glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,white);
+   glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,Emission);
+   glTranslated(x,y,z);
+   //glRotated(90,1,0,0);
+   glScaled(dx,dy,1);
+
+   //  Save transformation
+   glPushMatrix();
+   glEnable(GL_POLYGON_OFFSET_FILL);
+   glPolygonOffset(1,1);
+   //  Enable textures
+   glEnable(GL_TEXTURE_2D);
+   glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,mode?GL_REPLACE:GL_MODULATE);
+   glColor3f(1,1,1);
+   glBindTexture(GL_TEXTURE_2D,texture[0]);
+   //  Draw road
+   glColor3f(1,1,1);
+   glBindTexture(GL_TEXTURE_2D,texture[0]);
+   glBegin(GL_QUADS);
+   glNormal3f( 0,+1, 0);
+   glTexCoord2f(0,  0);     glVertex2f(-roadWidth/2.0,-roadLen/2.0);
+   glTexCoord2f(2*rep,0);   glVertex2f(-roadWidth/2.0,+roadLen/2.0);
+   glTexCoord2f(2*rep,rep); glVertex2f(+roadWidth/2.0,+roadLen/2.0);
+   glTexCoord2f(0,  rep);   glVertex2f(+roadWidth/2.0,-roadLen/2.0);
+   glEnd();
+   //  Undo transformations and textures
+   glDisable(GL_POLYGON_OFFSET_FILL);
+   glDisable(GL_TEXTURE_2D);
    glPopMatrix();
  }
 
@@ -689,6 +674,7 @@ static void water(double x,double y,double z,
  *     rotated th about the y axis
  */
 static void building(int building_texture_index,
+		     double width, double height, double depth,
                      double x,double y,double z,
                      double dx,double dy,double dz,
                      double th)
@@ -714,56 +700,56 @@ static void building(int building_texture_index,
    glBindTexture(GL_TEXTURE_2D,building_texture[building_texture_index]);
    glBegin(GL_QUADS);
    glNormal3f( 0, 0, 1);
-   glTexCoord2f(0,0); glVertex3f(-1, 0, 1);
-   glTexCoord2f(1,0); glVertex3f(+1, 0, 1);
-   glTexCoord2f(1,1); glVertex3f(+1,+2, 1);
-   glTexCoord2f(0,1); glVertex3f(-1,+2, 1);
+   glTexCoord2f(0,0); glVertex3f(-width/2.0,     0,depth/2.0);
+   glTexCoord2f(1,0); glVertex3f(+width/2.0,     0,depth/2.0);
+   glTexCoord2f(1,1); glVertex3f(+width/2.0,height,depth/2.0);
+   glTexCoord2f(0,1); glVertex3f(-width/2.0,height,depth/2.0);
    glEnd();
    //  Back
    glBindTexture(GL_TEXTURE_2D,building_texture[building_texture_index]);
    glBegin(GL_QUADS);
    glNormal3f( 0, 0,-1);
-   glTexCoord2f(0,0); glVertex3f(+1, 0,-1);
-   glTexCoord2f(1,0); glVertex3f(-1, 0,-1);
-   glTexCoord2f(1,1); glVertex3f(-1,+2,-1);
-   glTexCoord2f(0,1); glVertex3f(+1,+2,-1);
+   glTexCoord2f(0,0); glVertex3f(+width/2.0,      0,-depth/2.0);
+   glTexCoord2f(1,0); glVertex3f(-width/2.0,      0,-depth/2.0);
+   glTexCoord2f(1,1); glVertex3f(-width/2.0,height,-depth/2.0);
+   glTexCoord2f(0,1); glVertex3f(+width/2.0,height,-depth/2.0);
    glEnd();
    //  Right
    glBindTexture(GL_TEXTURE_2D,building_texture[building_texture_index]);
    glBegin(GL_QUADS);
    glNormal3f(+1, 0, 0);
-   glTexCoord2f(0,0); glVertex3f(+1, 0,+1);
-   glTexCoord2f(1,0); glVertex3f(+1, 0,-1);
-   glTexCoord2f(1,1); glVertex3f(+1,+2,-1);
-   glTexCoord2f(0,1); glVertex3f(+1,+2,+1);
+   glTexCoord2f(0,0); glVertex3f(+width/2.0,     0,+depth/2.0);
+   glTexCoord2f(1,0); glVertex3f(+width/2.0,     0,-depth/2.0);
+   glTexCoord2f(1,1); glVertex3f(+width/2.0,height,-depth/2.0);
+   glTexCoord2f(0,1); glVertex3f(+width/2.0,height,+depth/2.0);
    glEnd();
    //  Left
    glBindTexture(GL_TEXTURE_2D,building_texture[building_texture_index]);
    glBegin(GL_QUADS);
    glNormal3f(-1, 0, 0);
-   glTexCoord2f(0,0); glVertex3f(-1, 0,-1);
-   glTexCoord2f(1,0); glVertex3f(-1, 0,+1);
-   glTexCoord2f(1,1); glVertex3f(-1,+2,+1);
-   glTexCoord2f(0,1); glVertex3f(-1,+2,-1);
+   glTexCoord2f(0,0); glVertex3f(-width/2.0,     0,-depth/2.0);
+   glTexCoord2f(1,0); glVertex3f(-width/2.0,     0,+depth/2.0);
+   glTexCoord2f(1,1); glVertex3f(-width/2.0,height,+depth/2.0);
+   glTexCoord2f(0,1); glVertex3f(-width/2.0,height,-depth/2.0);
    glEnd();
    //  Top
    glColor3f(0.7,0.7,0.7);
    glBindTexture(GL_TEXTURE_2D,texture[1]);  //  Use sidewalk texture for roof
    glBegin(GL_QUADS);
    glNormal3f( 0,+1, 0);
-   glTexCoord2f(0,0); glVertex3f(-1,+2,+1);
-   glTexCoord2f(1,0); glVertex3f(+1,+2,+1);
-   glTexCoord2f(1,1); glVertex3f(+1,+2,-1);
-   glTexCoord2f(0,1); glVertex3f(-1,+2,-1);
+   glTexCoord2f(0,0); glVertex3f(-width/2.0,height,+depth/2.0);
+   glTexCoord2f(1,0); glVertex3f(+width/2.0,height,+depth/2.0);
+   glTexCoord2f(1,1); glVertex3f(+width/2.0,height,-depth/2.0);
+   glTexCoord2f(0,1); glVertex3f(-width/2.0,height,-depth/2.0);
    glEnd();
    //  Bottom
    glBindTexture(GL_TEXTURE_2D,texture[1]);  //  Use sidewalk texture for under building
    glBegin(GL_QUADS);
    glNormal3f( 0,-1, 0);
-   glTexCoord2f(0,0); glVertex3f(-1, 0,-1);
-   glTexCoord2f(1,0); glVertex3f(+1, 0,-1);
-   glTexCoord2f(1,1); glVertex3f(+1, 0,+1);
-   glTexCoord2f(0,1); glVertex3f(-1, 0,+1);
+   glTexCoord2f(0,0); glVertex3f(-width/2.0,0,-depth/2.0);
+   glTexCoord2f(1,0); glVertex3f(+width/2.0,0,-depth/2.0);
+   glTexCoord2f(1,1); glVertex3f(+width/2.0,0,+depth/2.0);
+   glTexCoord2f(0,1); glVertex3f(-width/2.0,0,+depth/2.0);
    glEnd();
    //  Undo transformations and textures
    glPopMatrix();
@@ -777,12 +763,13 @@ static void building(int building_texture_index,
  *     rotated th about the y axis
  */
 static void building_with_reflection(int building_texture_index,
+                     double width, double height, double depth,
                      double x,double y,double z,
                      double dx,double dy,double dz,
                      double th)
 {
-   building(building_texture_index, x,y,z, dx,dy,dz,  th);
-   building(building_texture_index, x,y,z, dx,-dy,dz, th);
+   building(building_texture_index, width,height,depth, x,y,z, dx,dy,dz,  th);
+   building(building_texture_index, width,height,depth, x,y,z, dx,-dy,dz, th);
 }
 
 /*
@@ -809,8 +796,8 @@ static void Vertex(double th,double ph)
                           double r, double d,
                           double th)
 {
+   y = 1+y;
    int i,k;
-
    //  DRAW BASE
    glEnable(GL_TEXTURE_2D);
    //  Save transformation
@@ -958,69 +945,8 @@ static void Vertex(double th,double ph)
    glDisable(GL_TEXTURE_2D);
 
 
-//   //  DRAW GROUND FIXTURE
-//   //  Save transformation
-//   glPushMatrix();
-//   //  Offset, scale and rotate
-//   glTranslated(x,y-d,z);
-//   glScaled(r*2.0,r,r*2.0);
-//   //  White ball
-//   glColor3f(0.1,0.1,0.1);
-//   glutSolidSphere(1.0,16,16);
-//   //  Undo transofrmations
-//   glPopMatrix();
-
-//   int ball_th,ball_ph;
-//   int inc=10;
-//   float yellow[] = {1.0,1.0,0.0,1.0};
-//   float Emission[]  = {0.0,0.0,0.01*emission,1.0};
-//   //  Save transformation
-//   glPushMatrix();
-//   //  Offset, scale and rotate
-//   glTranslated(x,y-d,z);
-//   glScaled(r*2.0,r*2.0,r*2.0);
-//   //  White ball
-//   glColor3f(1,1,1);
-//   glMaterialf(GL_FRONT,GL_SHININESS,shiny);
-//   glMaterialfv(GL_FRONT,GL_SPECULAR,yellow);
-//   glMaterialfv(GL_FRONT,GL_EMISSION,Emission);
-//   //  Bands of latitude
-//   for (ball_ph=-90;ball_ph<90;ball_ph+=inc)
-//   {
-//      glBegin(GL_QUAD_STRIP);
-//      for (ball_th=0;ball_th<=360;ball_th+=2*inc)
-//      {
-//         Vertex(ball_th,ball_ph);
-//         Vertex(ball_th,ball_ph+inc);
-//      }
-//      glEnd();
-//   }
-
-   
-   int ball_th,ball_ph;
-  /* glPushMatrix();
-   glTranslated(x,y-d,z);
-   glScaled(r*2.0,r*2.0,r*2.0);
-   glEnable(GL_TEXTURE_2D);
-   glBindTexture(GL_TEXTURE_2D,texture[0]);
-   //  Latitude bands
-   glColor3f(1,1,1);
-   for (ball_ph=-90;ball_ph<90;ball_ph+=5)
-   {
-      glBegin(GL_QUAD_STRIP);
-      for (ball_th=0;ball_th<=360;ball_th+=5)
-      {
-         Vertex(ball_th,ball_ph);
-         Vertex(ball_th,ball_ph+5);
-      }
-      glEnd();
-   }
-   //  Undo transofrmations
-   glPopMatrix();
-   */
-
-
    //  DRAW LIGHT
+   int ball_th,ball_ph;
    int inc=10;
    float yellow[] = {1.0,1.0,0.0,1.0};
    float Emission[]  = {0.0,0.0,0.01*emission,1.0};
@@ -1048,6 +974,7 @@ static void Vertex(double th,double ph)
    //  Undo transofrmations
    glPopMatrix();
 }
+
 
 /*
  *  Draw sky box
@@ -1201,18 +1128,31 @@ void display()
    car_with_reflection(-5.7+movement_x,0,0.7 , 0.05,0.05,0.05, 0  , tire_rot, 205,150,10);  // yellow car
    car_with_reflection(+5.7-movement_x,0,-0.7, 0.05,0.05,0.05, 180, tire_rot, 205,15,10);  // red car
 
+   /*
    building_with_reflection(3, -6.7,0,-4.2, 2.1,2.6,2.1, 0);    //  building 3 concrete/glass
    building_with_reflection(0, -2.7,0,-2.7, 1,1,1, 0);          //  building 0 brick storefront
    building_with_reflection(1, 0,0,-3.2, 1.3,1.3,1.3, 0);       //  building 1 yellow building glass storefront
    building_with_reflection(2, 2.7,0,-2.7, 1.3,1.3,1.3, 0);     //  building 2 old white/yellow/brown building
    building_with_reflection(1, 5.7,0,-3.5, 1.3,1.3,1.3, 0);       //  building 1 yellow building glass storefront
    building_with_reflection(3, 9.7,0,-4.2, 2.1,2.6,2.1, 0);    //  building 3 concrete/glass
+   */
 
-   road(    0,0 ,0  , 1,1, 0, rep);
-   water(0,0, 2.6, 1,3, 0, rep);
-   sidewalk(0,0,-2.6, 1,1, 0, rep);
+   building_with_reflection(0, 2,2,2,   -4.5,0,-4, 1,1,1, 0);    //  building 3 concrete/glass
+   building_with_reflection(3, 2,3,2,   -2.0,0,-4, 1,1,1, 0);    //  building 3 concrete/glass
+   building_with_reflection(2, 2,2.5,2,  0.5,0,-4, 1,1,1, 0);    //  building 3 concrete/glass
+   building_with_reflection(1, 2,2,2,    3.0,0,-4, 1,1,1, 0);    //  building 3 concrete/glass
 
-   road(    -8,0 ,0  , 1,1, 0, rep);
+   building_with_reflection(2, 2,2.5,2, -4.5,0,-8, 1,1,1, 0);    //  building 3 concrete/glass
+   building_with_reflection(0, 2,2,2,   -2.0,0,-8, 1,1,1, 0);    //  building 3 concrete/glass
+   building_with_reflection(1, 2,2,2,    0.5,0,-8, 1,1,1, 0);    //  building 3 concrete/glass
+   building_with_reflection(3, 2,3,2,    3.0,0,-8, 1,1,1, 0);    //  building 3 concrete/glass
+
+   road(0,0,0, 1,1,  0, rep);
+   crossroad(6,-6,0, 1,1, 45, rep);
+   //water(0,0, 2.6, 1,3, 0, rep);
+   sidewalk(-7,0,0, 0, rep);
+
+   /*road(    -8,0 ,0  , 1,1, 0, rep);
    water(-8,0, 2.6, 1,3, 0, rep);
    sidewalk(-8,0,-2.6, 1,1, 0, rep);
 
@@ -1220,8 +1160,9 @@ void display()
    water(8,0, 2.6, 1,3, 0, rep);
    sidewalk(8,0,-2.6, 1,1, 0, rep);
 
-   street_light(0,1,0, 0.05,1, 0);
-   //spotlight(0,0,0);
+   street_light(0,0,0, 0.05,1, 0);
+   street_light(1,0,0, 0.05,1, 0);   //spotlight(0,0,0);
+   */
 
    //  Draw axes - no lighting from here on
    glDisable(GL_LIGHTING);
