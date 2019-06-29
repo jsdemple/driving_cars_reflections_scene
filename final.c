@@ -24,13 +24,13 @@
 #include "CSCIx229.h"
 int mode=0;       //  Texture mode
 int ntex=0;       //  Cube faces
-int axes=1;       //  Display axes
-int th=0;         //  Azimuth of view angle
-int ph=10;         //  Elevation of view angle
+int axes=0;       //  Display axes
+int th=-10;         //  Azimuth of view angle
+int ph=5;         //  Elevation of view angle
 int light=1;      //  Lighting
 int rep=10;        //  Repitition
 double asp=1;     //  Aspect ratio
-double dim=3.0;   //  Size of world  1.3
+double dim=5.9;   //  Size of world  1.3
 const double PI = 3.1415927;
 // Light values
 int emission  =   0;  // Emission intensity (%)
@@ -49,8 +49,9 @@ unsigned int building_texture[4];
 int box=1;	//  Draw sky
 int sky[2];	//  Sky textures
 //  Movement
+double speed=4;
 double movement_x=0;
-double movement_x_thresh=28;
+double movement_x_thresh=68;
 double tire_rot=0;
 
 
@@ -984,6 +985,7 @@ static void cityBlock(double x, double y, double z)
    glTranslated(x,y,z);
    //glScaled(r*2.0,r,r*2.0);
 
+
    //  First row of buildings
    building_with_reflection(0, 2,2,2,   -4.5,0,-4, 1,1,1, 0);    //  building 3 concrete/glass
    building_with_reflection(3, 2,3,2,   -2.0,0,-4, 1,1,1, 0);    //  building 3 concrete/glass
@@ -996,15 +998,15 @@ static void cityBlock(double x, double y, double z)
    building_with_reflection(3, 2,3,2,    3.0,0,-8, 1,1,1, 0);    //  building 3 concrete/glass
 
    //  Ground
-   road(0,0,0, 1,1,  0, rep);
-   water(0,0,16, 0, rep);
-   crossroad(6,0,-6, 1,1, 45, rep);
-   sidewalk(-1,0,-6, 0, rep);
+   road(     0,0, 0, 1,1, 0, rep);
+   crossroad(6,0,-6, 1,1, 0, rep);
+   sidewalk(-1,0,-6, 0,      rep);
    
    //  Street Objects
    street_light(-5.5,0,-1.25, 0.03,1, 0);
    street_light(-1,0,-1.25, 0.03,1, 0);
    street_light(4,0,-1.25, 0.03,1, 0);
+
 
    glPopMatrix();
 }
@@ -1159,12 +1161,18 @@ void display()
       glDisable(GL_LIGHTING);
 
    //  Cars
-   car_with_reflection(-20+movement_x,0, 0.45, 0.04,0.04,0.04, 0  , tire_rot, 205,150,10);  // yellow car
-   car_with_reflection(+20-movement_x,0,-0.45, 0.04,0.04,0.04, 180, tire_rot, 205,15,10);  // red car
+   car_with_reflection(-19+movement_x,0, 0.45, 0.04,0.04,0.04, 0  , tire_rot, 205,150, 10);  // yellow car
+   car_with_reflection(+24-movement_x,0,-0.45, 0.04,0.04,0.04, 180, tire_rot, 205, 15, 10);  // red car
+   car_with_reflection(-27+movement_x,0, 0.45, 0.04,0.04,0.04, 0  , tire_rot,  10,150,205);  // blue car
+   car_with_reflection(+34-movement_x,0,-0.45, 0.04,0.04,0.04, 180, tire_rot,  15,205,150);  // aqua car
+   car_with_reflection(-38+movement_x,0, 0.45, 0.04,0.04,0.04, 0  , tire_rot, 205,150, 10);  // yellow car
+   car_with_reflection(+44-movement_x,0,-0.45, 0.04,0.04,0.04, 180, tire_rot, 255,115, 10);  // orange car
+   car_with_reflection(-50+movement_x,0, 0.45, 0.04,0.04,0.04, 0  , tire_rot, 205,150,205);  // lavender car
+   car_with_reflection(+52-movement_x,0,-0.45, 0.04,0.04,0.04, 180, tire_rot,  15,205,150);  // aqua car
 
-   cityBlock(-14,0,0);
-   cityBlock(14,0,0);
-   cityBlock(0,0,0);
+   cityBlock(-14,0,0);  cityBlock(-14,0,-12);  cityBlock(-14,0,-24);  water(-14,0,16, 0, rep);
+   cityBlock( 14,0,0);  cityBlock( 14,0,-12);  cityBlock( 14,0,-24);  water( 14,0,16, 0, rep);
+   cityBlock(  0,0,0);  cityBlock(  0,0,-12);  cityBlock(  0,0,-24);  water(  0,0,16, 0, rep);
 
    //  Draw axes - no lighting from here on
    glDisable(GL_LIGHTING);
@@ -1189,7 +1197,7 @@ void display()
    }
    //  Display parameters
    glWindowPos2i(5,5);
-   Print("Angle=%d,%d  Dim=%.1f Light=%s Movement=%.1f",th,ph,dim,light?"On":"Off",movement_x);
+   Print("Angle=%d,%d  Dim=%.1f Light=%s Movement=%.1f Speed=%.1f",th,ph,dim,light?"On":"Off",movement_x,speed);
    if (light)
    {
       glWindowPos2i(5,25);
@@ -1215,9 +1223,9 @@ void idle()
    }
    else
    {
-      movement_x = fmod(t*2.0, movement_x_thresh);
+      movement_x = fmod(t*speed, movement_x_thresh);
    }
-   tire_rot = t*400;
+   tire_rot = t*(speed*200);
    //  Tell GLUT it is necessary to redisplay the scene
    glutPostRedisplay();
 }
@@ -1295,10 +1303,15 @@ void key(unsigned char ch,int x,int y)
       diffuse -= 5;
    else if (ch=='D' && diffuse<100)
       diffuse += 5;
+   //  Speed of motion
+   else if (ch=='s' && speed>0)
+      speed -= 0.5;
+   else if (ch=='S' && speed<100)
+      speed += 0.5;
    //  Specular level
-   else if (ch=='s' && specular>0)
+   else if (ch=='r' && specular>0)
       specular -= 5;
-   else if (ch=='S' && specular<100)
+   else if (ch=='R' && specular<100)
       specular += 5;
    //  Emission level
    else if (ch=='e' && emission>0)
