@@ -22,7 +22,6 @@
  */
 
 #include "CSCIx229.h"
-int mode=0;       //  Texture mode
 int ntex=0;       //  Cube faces
 int axes=0;       //  Display axes
 int th=-10;         //  Azimuth of view angle
@@ -34,13 +33,13 @@ double dim=5.9;   //  Size of world  1.3
 const double PI = 3.1415927;
 // Light values
 int emission  =   0;  // Emission intensity (%)
-int ambient   =  30;  // Ambient intensity (%)
+int ambient   =  15;  // Ambient intensity (%)
 int diffuse   = 100;  // Diffuse intensity (%)
 int specular  =   0;  // Specular intensity (%)
 int shininess =   0;  // Shininess (power of two)
 float shiny   =   1;    // Shininess (value)
 int zh        =  90;  // Light azimuth
-float ylight  =   0.5;  // Elevation of light
+float ylight  =  10;  // Elevation of light
 int side      =   0;  // Two sided lighting mode
 //  Textures
 unsigned int texture[2]; // Texture names
@@ -51,8 +50,10 @@ int sky[2];	//  Sky textures
 //  Movement
 double speed=4;
 double movement_x=0;
-double movement_x_thresh=68;
+double movement_x_thresh=56;
 double tire_rot=0;
+//  Mode: 0=Passing Cars, 1=Passing City Blocks
+int mode=0;
 
 
 /*
@@ -111,7 +112,7 @@ static void car(double x, double y, double z,
    glPushMatrix();  // textured faces
    //  Enable textures
    glEnable(GL_TEXTURE_2D);
-   glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,mode?GL_REPLACE:GL_MODULATE);
+   glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
    glColor3f(1,1,1);
    //glBindTexture(GL_TEXTURE_2D,texture[0]);
    //  Passenger
@@ -181,7 +182,7 @@ static void car(double x, double y, double z,
    glPushMatrix();
    //  Enable textures
    glEnable(GL_TEXTURE_2D);
-   glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,mode?GL_REPLACE:GL_MODULATE);
+   glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
    //  Passenger
    glColor3f(windsh_tint[0], windsh_tint[1], windsh_tint[2]);
    glBindTexture(GL_TEXTURE_2D,car_texture[5]);
@@ -531,7 +532,7 @@ static void road(double x,double y,double z,
    glScaled(dx,dy,1);*/
    //  Enable textures
    glEnable(GL_TEXTURE_2D);
-   glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,mode?GL_REPLACE:GL_MODULATE);
+   glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
    glColor3f(1,1,1);
    glBindTexture(GL_TEXTURE_2D,texture[0]);
    //  Draw road
@@ -608,7 +609,7 @@ static void crossroad(double x,double y,double z,
    glPolygonOffset(1,1);
    //  Enable textures
    glEnable(GL_TEXTURE_2D);
-   glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,mode?GL_REPLACE:GL_MODULATE);
+   glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
    glColor3f(1,1,1);
    glBindTexture(GL_TEXTURE_2D,texture[0]);
    //  Draw road
@@ -694,7 +695,7 @@ static void building(int building_texture_index,
    glScaled(dx,dy,dz);
    //  Enable textures
    glEnable(GL_TEXTURE_2D);
-   glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,mode?GL_REPLACE:GL_MODULATE);
+   glTexEnvi(GL_TEXTURE_ENV,GL_TEXTURE_ENV_MODE,GL_MODULATE);
    glColor3f(1,1,1);
    //glBindTexture(GL_TEXTURE_2D,building_texture[building_texture_index]);
    //  Front
@@ -949,8 +950,8 @@ static void Vertex(double th,double ph)
    //  DRAW LIGHT
    int ball_th,ball_ph;
    int inc=10;
-   float yellow[] = {1.0,1.0,0.0,1.0};
-   float Emission[]  = {0.0,0.0,0.01*emission,1.0};
+   float white[] = {1.0,1.0,1.0,1.0};
+   float Emission[]  = {0.5,0.5,0.9,1.0};
    //  Save transformation
    glPushMatrix();
    //  Offset, scale and rotate
@@ -959,7 +960,7 @@ static void Vertex(double th,double ph)
    //  White ball
    glColor3f(1,1,1);
    glMaterialf(GL_FRONT,GL_SHININESS,shiny);
-   glMaterialfv(GL_FRONT,GL_SPECULAR,yellow);
+   glMaterialfv(GL_FRONT,GL_SPECULAR,white);
    glMaterialfv(GL_FRONT,GL_EMISSION,Emission);
    //  Bands of latitude
    for (ball_ph=-90;ball_ph<90;ball_ph+=inc)
@@ -974,6 +975,7 @@ static void Vertex(double th,double ph)
    }
    //  Undo transofrmations
    glPopMatrix();
+
 }
 
 /*
@@ -1160,19 +1162,35 @@ void display()
    else
       glDisable(GL_LIGHTING);
 
-   //  Cars
-   car_with_reflection(-19+movement_x,0, 0.45, 0.04,0.04,0.04, 0  , tire_rot, 205,150, 10);  // yellow car
-   car_with_reflection(+24-movement_x,0,-0.45, 0.04,0.04,0.04, 180, tire_rot, 205, 15, 10);  // red car
-   car_with_reflection(-27+movement_x,0, 0.45, 0.04,0.04,0.04, 0  , tire_rot,  10,150,205);  // blue car
-   car_with_reflection(+34-movement_x,0,-0.45, 0.04,0.04,0.04, 180, tire_rot,  15,205,150);  // aqua car
-   car_with_reflection(-38+movement_x,0, 0.45, 0.04,0.04,0.04, 0  , tire_rot, 205,150, 10);  // yellow car
-   car_with_reflection(+44-movement_x,0,-0.45, 0.04,0.04,0.04, 180, tire_rot, 255,115, 10);  // orange car
-   car_with_reflection(-50+movement_x,0, 0.45, 0.04,0.04,0.04, 0  , tire_rot, 205,150,205);  // lavender car
-   car_with_reflection(+52-movement_x,0,-0.45, 0.04,0.04,0.04, 180, tire_rot,  15,205,150);  // aqua car
-
-   cityBlock(-14,0,0);  cityBlock(-14,0,-12);  cityBlock(-14,0,-24);  water(-14,0,16, 0, rep);
-   cityBlock( 14,0,0);  cityBlock( 14,0,-12);  cityBlock( 14,0,-24);  water( 14,0,16, 0, rep);
-   cityBlock(  0,0,0);  cityBlock(  0,0,-12);  cityBlock(  0,0,-24);  water(  0,0,16, 0, rep);
+   if (mode)
+   {
+      //  Cars
+      car_with_reflection(0,0,-0.45, 0.04,0.04,0.04, 180, tire_rot, 255,115, 10);  // orange car
+      //  Surroundings
+      cityBlock(-84+movement_x,0,0);  cityBlock(-84+movement_x,0,-12);  cityBlock(-84+movement_x,0,-24);  water(-84+movement_x,0,16, 0, rep);
+      cityBlock(-70+movement_x,0,0);  cityBlock(-70+movement_x,0,-12);  cityBlock(-70+movement_x,0,-24);  water(-70+movement_x,0,16, 0, rep);
+      cityBlock(-56+movement_x,0,0);  cityBlock(-56+movement_x,0,-12);  cityBlock(-56+movement_x,0,-24);  water(-56+movement_x,0,16, 0, rep);
+      cityBlock(-42+movement_x,0,0);  cityBlock(-42+movement_x,0,-12);  cityBlock(-42+movement_x,0,-24);  water(-42+movement_x,0,16, 0, rep);
+      cityBlock(-28+movement_x,0,0);  cityBlock(-28+movement_x,0,-12);  cityBlock(-28+movement_x,0,-24);  water(-28+movement_x,0,16, 0, rep);
+      cityBlock(-14+movement_x,0,0);  cityBlock(-14+movement_x,0,-12);  cityBlock(-14+movement_x,0,-24);  water(-14+movement_x,0,16, 0, rep);
+      cityBlock( 14+movement_x,0,0);  cityBlock( 14+movement_x,0,-12);  cityBlock( 14+movement_x,0,-24);  water( 14+movement_x,0,16, 0, rep);
+      cityBlock(  0+movement_x,0,0);  cityBlock(  0+movement_x,0,-12);  cityBlock(  0+movement_x,0,-24);  water(  0+movement_x,0,16, 0, rep);
+   }   else
+   {
+      //  Cars
+      car_with_reflection(-19+movement_x,0, 0.45, 0.04,0.04,0.04, 0  , tire_rot, 205,150, 10);  // yellow car
+      car_with_reflection(+24-movement_x,0,-0.45, 0.04,0.04,0.04, 180, tire_rot, 205, 15, 10);  // red car
+      car_with_reflection(-27+movement_x,0, 0.45, 0.04,0.04,0.04, 0  , tire_rot,  10,150,205);  // blue car
+      car_with_reflection(+34-movement_x,0,-0.45, 0.04,0.04,0.04, 180, tire_rot,  15,205,150);  // aqua car
+      car_with_reflection(-38+movement_x,0, 0.45, 0.04,0.04,0.04, 0  , tire_rot, 205,150, 10);  // yellow car
+      car_with_reflection(+44-movement_x,0,-0.45, 0.04,0.04,0.04, 180, tire_rot, 255,115, 10);  // orange car
+      car_with_reflection(-50+movement_x,0, 0.45, 0.04,0.04,0.04, 0  , tire_rot, 205,150,205);  // lavender car
+      car_with_reflection(+52-movement_x,0,-0.45, 0.04,0.04,0.04, 180, tire_rot,  15,205,150);  // aqua car
+      //  Surroundings
+      cityBlock(-14,0,0);  cityBlock(-14,0,-12);  cityBlock(-14,0,-24);  water(-14,0,16, 0, rep);
+      cityBlock( 14,0,0);  cityBlock( 14,0,-12);  cityBlock( 14,0,-24);  water( 14,0,16, 0, rep);
+      cityBlock(  0,0,0);  cityBlock(  0,0,-12);  cityBlock(  0,0,-24);  water(  0,0,16, 0, rep);
+   }
 
    //  Draw axes - no lighting from here on
    glDisable(GL_LIGHTING);
@@ -1276,7 +1294,7 @@ void key(unsigned char ch,int x,int y)
    //  Reset view angle
    else if (ch == '0')
       th = ph = 25;
-   //  Toggle texture mode
+   //  Animation mode
    else if (ch == 'm' || ch == 'M')
       mode = 1-mode;
    //  Toggle axes
