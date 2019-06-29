@@ -50,6 +50,7 @@ int box=1;	//  Draw sky
 int sky[2];	//  Sky textures
 //  Movement
 double movement_x=0;
+double movement_x_thresh=28;
 double tire_rot=0;
 
 
@@ -639,7 +640,7 @@ static void water(double x,double y,double z,
 {
    //  Default Road Dimensions
    double Len=14;
-   double Width=2;
+   double Width=30;
    //  Save transformation
    glPushMatrix();
    glEnable(GL_BLEND);
@@ -648,7 +649,7 @@ static void water(double x,double y,double z,
    glColor4f(1.0, 1.0, 1.0, 0.3);
    //  Offset, scale and rotate
    glTranslated(x,y,z);
-   //glRotated(90,1,0,0);
+   glRotated(90,1,0,0);
    //glRotated(th,0,1,0);
    //  Draw water
    glBegin(GL_QUADS);
@@ -974,6 +975,39 @@ static void Vertex(double th,double ph)
    glPopMatrix();
 }
 
+/*
+ *  Draw city block
+ */
+static void cityBlock(double x, double y, double z)
+{
+   glPushMatrix();
+   glTranslated(x,y,z);
+   //glScaled(r*2.0,r,r*2.0);
+
+   //  First row of buildings
+   building_with_reflection(0, 2,2,2,   -4.5,0,-4, 1,1,1, 0);    //  building 3 concrete/glass
+   building_with_reflection(3, 2,3,2,   -2.0,0,-4, 1,1,1, 0);    //  building 3 concrete/glass
+   building_with_reflection(2, 2,2.5,2,  0.5,0,-4, 1,1,1, 0);    //  building 3 concrete/glass
+   building_with_reflection(1, 2,2,2,    3.0,0,-4, 1,1,1, 0);    //  building 3 concrete/glass
+   //  Second Row of buildings
+   building_with_reflection(2, 2,2.5,2, -4.5,0,-8, 1,1,1, 0);    //  building 3 concrete/glass
+   building_with_reflection(0, 2,2,2,   -2.0,0,-8, 1,1,1, 0);    //  building 3 concrete/glass
+   building_with_reflection(1, 2,2,2,    0.5,0,-8, 1,1,1, 0);    //  building 3 concrete/glass
+   building_with_reflection(3, 2,3,2,    3.0,0,-8, 1,1,1, 0);    //  building 3 concrete/glass
+
+   //  Ground
+   road(0,0,0, 1,1,  0, rep);
+   water(0,0,16, 0, rep);
+   crossroad(6,0,-6, 1,1, 45, rep);
+   sidewalk(-1,0,-6, 0, rep);
+   
+   //  Street Objects
+   street_light(-5.5,0,-1.25, 0.03,1, 0);
+   street_light(-1,0,-1.25, 0.03,1, 0);
+   street_light(4,0,-1.25, 0.03,1, 0);
+
+   glPopMatrix();
+}
 
 /*
  *  Draw sky box
@@ -1123,48 +1157,14 @@ void display()
    }
    else
       glDisable(GL_LIGHTING);
-   //  Draw scene
-   car_with_reflection(-5.7+movement_x,0,0.7 , 0.05,0.05,0.05, 0  , tire_rot, 205,150,10);  // yellow car
-   car_with_reflection(+5.7-movement_x,0,-0.7, 0.05,0.05,0.05, 180, tire_rot, 205,15,10);  // red car
 
-   /*
-   building_with_reflection(3, -6.7,0,-4.2, 2.1,2.6,2.1, 0);    //  building 3 concrete/glass
-   building_with_reflection(0, -2.7,0,-2.7, 1,1,1, 0);          //  building 0 brick storefront
-   building_with_reflection(1, 0,0,-3.2, 1.3,1.3,1.3, 0);       //  building 1 yellow building glass storefront
-   building_with_reflection(2, 2.7,0,-2.7, 1.3,1.3,1.3, 0);     //  building 2 old white/yellow/brown building
-   building_with_reflection(1, 5.7,0,-3.5, 1.3,1.3,1.3, 0);       //  building 1 yellow building glass storefront
-   building_with_reflection(3, 9.7,0,-4.2, 2.1,2.6,2.1, 0);    //  building 3 concrete/glass
-   */
+   //  Cars
+   car_with_reflection(-20+movement_x,0, 0.45, 0.04,0.04,0.04, 0  , tire_rot, 205,150,10);  // yellow car
+   car_with_reflection(+20-movement_x,0,-0.45, 0.04,0.04,0.04, 180, tire_rot, 205,15,10);  // red car
 
-   building_with_reflection(0, 2,2,2,   -4.5,0,-4, 1,1,1, 0);    //  building 3 concrete/glass
-   building_with_reflection(3, 2,3,2,   -2.0,0,-4, 1,1,1, 0);    //  building 3 concrete/glass
-   building_with_reflection(2, 2,2.5,2,  0.5,0,-4, 1,1,1, 0);    //  building 3 concrete/glass
-   building_with_reflection(1, 2,2,2,    3.0,0,-4, 1,1,1, 0);    //  building 3 concrete/glass
-
-   building_with_reflection(2, 2,2.5,2, -4.5,0,-8, 1,1,1, 0);    //  building 3 concrete/glass
-   building_with_reflection(0, 2,2,2,   -2.0,0,-8, 1,1,1, 0);    //  building 3 concrete/glass
-   building_with_reflection(1, 2,2,2,    0.5,0,-8, 1,1,1, 0);    //  building 3 concrete/glass
-   building_with_reflection(3, 2,3,2,    3.0,0,-8, 1,1,1, 0);    //  building 3 concrete/glass
-
-   road(0,0,0, 1,1,  0, rep);
-   //water(0,0,-5, 0, rep);
-   crossroad(6,0,-6, 1,1, 45, rep);
-   sidewalk(-1,0,-6, 0, rep);
-   
-   //street_light(0,0,0, 0.05,1, 0);
-
-
-   /*road(    -8,0 ,0  , 1,1, 0, rep);
-   water(-8,0, 2.6, 1,3, 0, rep);
-   sidewalk(-8,0,-2.6, 1,1, 0, rep);
-
-   road(    8,0 ,0  , 1,1, 0, rep);
-   water(8,0, 2.6, 1,3, 0, rep);
-   sidewalk(8,0,-2.6, 1,1, 0, rep);
-
-   street_light(0,0,0, 0.05,1, 0);
-   street_light(1,0,0, 0.05,1, 0);   //spotlight(0,0,0);
-   */
+   cityBlock(-14,0,0);
+   cityBlock(14,0,0);
+   cityBlock(0,0,0);
 
    //  Draw axes - no lighting from here on
    glDisable(GL_LIGHTING);
@@ -1209,8 +1209,15 @@ void idle()
    //  Elapsed time in seconds
    double t = glutGet(GLUT_ELAPSED_TIME)/1000.0;
    zh = fmod(90*t,360.0);
-   movement_x = t*0.55;
-   tire_rot = t*200;
+   if (movement_x > movement_x_thresh)
+   {
+      movement_x = 0;
+   }
+   else
+   {
+      movement_x = fmod(t*2.0, movement_x_thresh);
+   }
+   tire_rot = t*400;
    //  Tell GLUT it is necessary to redisplay the scene
    glutPostRedisplay();
 }
