@@ -24,7 +24,7 @@
 #include "CSCIx229.h"
 int mode=0;       //  Texture mode
 int ntex=0;       //  Cube faces
-int axes=0;       //  Display axes
+int axes=1;       //  Display axes
 int th=0;         //  Azimuth of view angle
 int ph=10;         //  Elevation of view angle
 int light=1;      //  Lighting
@@ -468,7 +468,7 @@ static void sidewalk(double x, double y, double z,
    glPolygonOffset(1,1);
    //  Offset, scale and rotate
    glTranslated(x,y,z);
-   glRotated(th,0,1,0);
+   glRotated(90,1,0,0);
    //  Enable textures
    glEnable(GL_TEXTURE_2D);
    glColor3f(1,1,1);
@@ -512,6 +512,7 @@ static void road(double x,double y,double z,
    glMaterialf(GL_FRONT_AND_BACK,GL_SHININESS,shiny);
    glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,white);
    glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,Emission);
+   glPushMatrix();
    glTranslated(x,y,z);
    glRotated(90,1,0,0);
    glRotated(th,0,1,0);
@@ -572,6 +573,7 @@ static void road(double x,double y,double z,
    glVertex2f(+roadLen/2.0,roadWidth*-0.01/2.0);
    glEnd();
    glPopMatrix();
+   glPopMatrix();
  }
 
 /*
@@ -592,15 +594,14 @@ static void crossroad(double x,double y,double z,
    //  Set specular color to white
    float white[] = {1,1,1,1};
    float Emission[]  = {0.0,0.0,0.01*emission,1.0};
+
+   glPushMatrix();
    glMaterialf(GL_FRONT_AND_BACK,GL_SHININESS,shiny);
    glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,white);
    glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,Emission);
    glTranslated(x,y,z);
-   //glRotated(90,1,0,0);
+   glRotated(90,1,0,0);
    glScaled(dx,dy,1);
-
-   //  Save transformation
-   glPushMatrix();
    glEnable(GL_POLYGON_OFFSET_FILL);
    glPolygonOffset(1,1);
    //  Enable textures
@@ -633,13 +634,12 @@ static void crossroad(double x,double y,double z,
  *     texture repeater variable
  */
 static void water(double x,double y,double z,
-                 double dx,double dy,
                  double th,
 		 double rep)
 {
    //  Default Road Dimensions
-   double Len=4;
-   double Width=1.3;
+   double Len=14;
+   double Width=2;
    //  Save transformation
    glPushMatrix();
    glEnable(GL_BLEND);
@@ -648,16 +648,15 @@ static void water(double x,double y,double z,
    glColor4f(1.0, 1.0, 1.0, 0.3);
    //  Offset, scale and rotate
    glTranslated(x,y,z);
-   glRotated(90,1,0,0);
-   glRotated(th,0,1,0);
-   glScaled(dx,dy,1);
+   //glRotated(90,1,0,0);
+   //glRotated(th,0,1,0);
    //  Draw water
    glBegin(GL_QUADS);
    glNormal3f( 0,+1, 0);
-   glVertex2f(-Len,-Width);
-   glVertex2f(+Len,-Width);
-   glVertex2f(+Len,+Width);
-   glVertex2f(-Len,+Width);
+   glVertex2f(-Len/2.0,-Width/2.0);
+   glVertex2f(+Len/2.0,-Width/2.0);
+   glVertex2f(+Len/2.0,+Width/2.0);
+   glVertex2f(-Len/2.0,+Width/2.0);
    glEnd();
    //  Undo transformations and textures
    glDisable(GL_POLYGON_OFFSET_FILL);
@@ -1148,9 +1147,12 @@ void display()
    building_with_reflection(3, 2,3,2,    3.0,0,-8, 1,1,1, 0);    //  building 3 concrete/glass
 
    road(0,0,0, 1,1,  0, rep);
-   crossroad(6,-6,0, 1,1, 45, rep);
-   //water(0,0, 2.6, 1,3, 0, rep);
-   sidewalk(-7,0,0, 0, rep);
+   //water(0,0,-5, 0, rep);
+   crossroad(6,0,-6, 1,1, 45, rep);
+   sidewalk(-1,0,-6, 0, rep);
+   
+   //street_light(0,0,0, 0.05,1, 0);
+
 
    /*road(    -8,0 ,0  , 1,1, 0, rep);
    water(-8,0, 2.6, 1,3, 0, rep);
