@@ -104,7 +104,7 @@ static void car(double x, double y, double z,
    glMaterialf(GL_FRONT_AND_BACK,GL_SHININESS,shiny);
    glMaterialfv(GL_FRONT_AND_BACK,GL_SPECULAR,white);
    glMaterialfv(GL_FRONT_AND_BACK,GL_EMISSION,Emission);
-   
+
    //  Draw Body
    glPushMatrix();  // textured faces
    //  Enable textures
@@ -259,7 +259,7 @@ static void car(double x, double y, double z,
    glPushMatrix();
    //  Offset and scale
    glTranslated(Tx,Ty,Tz);
-   glRotated(-tire_rot,0,0,1);   
+   glRotated(-tire_rot,0,0,1);
    glScaled(tire_radius,tire_radius,tire_width);
    //  Faces
    glColor3f(1,1,1);
@@ -284,14 +284,14 @@ static void car(double x, double y, double z,
    for (k=0;k<=360;k+=10)
    {
    glNormal3f(Cos(k),Sin(k),0);
-   glTexCoord2f(0,0.5*k); glVertex3f(Cos(k),Sin(k),+1);
-   glTexCoord2f(1,0.5*k); glVertex3f(Cos(k),Sin(k),-1);
+   glTexCoord2f(0,0.05*k); glVertex3f(Cos(k),Sin(k),+1);
+   glTexCoord2f(1,0.05*k); glVertex3f(Cos(k),Sin(k),-1);
    }
    glEnd();
    //  Undo transformations
    glPopMatrix();
    glDisable(GL_TEXTURE_2D);
-   
+
    //  Tire: Passenger Rear
    i = 1;
    Tx=tire_pos[i][0];
@@ -302,7 +302,7 @@ static void car(double x, double y, double z,
    glPushMatrix();
    //  Offset and scale
    glTranslated(Tx,Ty,Tz);
-   glRotated(-tire_rot,0,0,1);  
+   glRotated(-tire_rot,0,0,1);
    glScaled(tire_radius,tire_radius,tire_width);
    //  Faces
    glColor3f(1,1,1);
@@ -327,8 +327,8 @@ static void car(double x, double y, double z,
    for (k=0;k<=360;k+=10)
    {
    glNormal3f(Cos(k),Sin(k),0);
-   glTexCoord2f(0,0.5*k); glVertex3f(Cos(k),Sin(k),+1);
-   glTexCoord2f(1,0.5*k); glVertex3f(Cos(k),Sin(k),-1);
+   glTexCoord2f(0,0.05*k); glVertex3f(Cos(k),Sin(k),+1);
+   glTexCoord2f(1,0.05*k); glVertex3f(Cos(k),Sin(k),-1);
    }
    glEnd();
    //  Undo transformations
@@ -345,7 +345,7 @@ static void car(double x, double y, double z,
    glPushMatrix();
    //  Offset and scale
    glTranslated(Tx,Ty,Tz);
-   glRotated(-tire_rot,0,0,1);  
+   glRotated(-tire_rot,0,0,1);
    glScaled(tire_radius,tire_radius,tire_width);
    //  Faces
    glColor3f(1,1,1);
@@ -370,8 +370,8 @@ static void car(double x, double y, double z,
    for (k=0;k<=360;k+=10)
    {
    glNormal3f(Cos(k),Sin(k),0);
-   glTexCoord2f(0,0.5*k); glVertex3f(Cos(k),Sin(k),+1);
-   glTexCoord2f(1,0.5*k); glVertex3f(Cos(k),Sin(k),-1);
+   glTexCoord2f(0,0.05*k); glVertex3f(Cos(k),Sin(k),+1);
+   glTexCoord2f(1,0.05*k); glVertex3f(Cos(k),Sin(k),-1);
    }
    glEnd();
    //  Undo transformations
@@ -388,7 +388,7 @@ static void car(double x, double y, double z,
    glPushMatrix();
    //  Offset and scale
    glTranslated(Tx,Ty,Tz);
-   glRotated(-tire_rot,0,0,1);  
+   glRotated(-tire_rot,0,0,1);
    glScaled(tire_radius,tire_radius,tire_width);
    //  Faces
    glColor3f(1,1,1);
@@ -413,8 +413,8 @@ static void car(double x, double y, double z,
    for (k=0;k<=360;k+=10)
    {
    glNormal3f(Cos(k),Sin(k),0);
-   glTexCoord2f(0,0.5*k); glVertex3f(Cos(k),Sin(k),+1);
-   glTexCoord2f(1,0.5*k); glVertex3f(Cos(k),Sin(k),-1);
+   glTexCoord2f(0,0.05*k); glVertex3f(Cos(k),Sin(k),+1);
+   glTexCoord2f(1,0.05*k); glVertex3f(Cos(k),Sin(k),-1);
    }
    glEnd();
    //  Undo transformations
@@ -785,8 +785,271 @@ static void building_with_reflection(int building_texture_index,
    building(building_texture_index, x,y,z, dx,-dy,dz, th);
 }
 
+/*
+ *  Draw vertex in polar coordinates with normal
+ */
+static void Vertex(double th,double ph)
+{
+   double x = Sin(th)*Cos(ph);
+   double y = Cos(th)*Cos(ph);
+   double z =         Sin(ph);
+   //  For a sphere at the origin, the position
+   //  and normal vectors are the same
+   glNormal3d(x,y,z);
+   glVertex3d(x,y,z);
+}
 
-/* 
+/*
+ *  Draw a street light
+ *     at (x,y,z)
+ *     dimensions (dx,dy,dz)
+ *     rotated th about the y axis
+ */
+ static void street_light(double x, double y, double z,
+                          double r, double d,
+                          double th)
+{
+   int i,k;
+
+   //  DRAW BASE
+   glEnable(GL_TEXTURE_2D);
+   //  Save transformation
+   glPushMatrix();
+   //  Offset and scale
+   glTranslated(x,y,z);
+   glRotated(90,1,0,0);
+   glScaled(r,r,d);
+   //  Head & Tail
+   glColor3f(1,1,1);
+   for (i=1;i>=-1;i-=2)
+   {
+      glBindTexture(GL_TEXTURE_2D,texture[0]);
+      glNormal3f(0,0,i);
+      glBegin(GL_TRIANGLE_FAN);
+      glTexCoord2f(0.5,0.5);
+      glVertex3f(0,0,i);
+      for (k=0;k<=360;k+=10)
+      {
+         glTexCoord2f(0.5*Cos(k)+0.5,0.5*Sin(k)+0.5);
+         glVertex3f(i*Cos(k),Sin(k),i);
+      }
+      glEnd();
+   }
+   //  Edge
+   glBindTexture(GL_TEXTURE_2D,texture[0]);
+   glColor3f(1,1,1);
+   glBegin(GL_QUAD_STRIP);
+   for (k=0;k<=360;k+=10)
+   {
+      glNormal3f(Cos(k),Sin(k),0);
+      glTexCoord2f(0,0.5*k); glVertex3f(Cos(k),Sin(k),+1);
+      glTexCoord2f(1,0.5*k); glVertex3f(Cos(k),Sin(k),-1);
+   }
+   glEnd();
+   //  Undo transformations
+   glPopMatrix();
+   glDisable(GL_TEXTURE_2D);
+
+
+   //  DRAW HORIZONTAL ARM
+   glEnable(GL_TEXTURE_2D);
+   //  Save transformation
+   glPushMatrix();
+   //  Offset and scale
+   glTranslated(x,y+d,z+(d/2.0));
+   glScaled(r,r,d/2.0);
+   //  Head & Tail
+   glColor3f(1,1,1);
+   for (i=1;i>=-1;i-=2)
+   {
+      glBindTexture(GL_TEXTURE_2D,texture[0]);
+      glNormal3f(0,0,i);
+      glBegin(GL_TRIANGLE_FAN);
+      glTexCoord2f(0.5,0.5);
+      glVertex3f(0,0,i);
+      for (k=0;k<=360;k+=10)
+      {
+         glTexCoord2f(0.5*Cos(k)+0.5,0.5*Sin(k)+0.5);
+         glVertex3f(i*Cos(k),Sin(k),i);
+      }
+      glEnd();
+   }
+   //  Edge
+   glBindTexture(GL_TEXTURE_2D,texture[0]);
+   glColor3f(1,1,1);
+   glBegin(GL_QUAD_STRIP);
+   for (k=0;k<=360;k+=10)
+   {
+      glNormal3f(Cos(k),Sin(k),0);
+      glTexCoord2f(0,0.5*k); glVertex3f(Cos(k),Sin(k),+1);
+      glTexCoord2f(1,0.5*k); glVertex3f(Cos(k),Sin(k),-1);
+   }
+   glEnd();
+   //  Undo transformations
+   glPopMatrix();
+   glDisable(GL_TEXTURE_2D);
+
+
+   //  DRAW LIGHT FIXTURE
+   glEnable(GL_TEXTURE_2D);
+   //  Save transformation
+   glPushMatrix();
+   //  Offset and scale
+   glTranslated(x,y+d-(r),z+(d));
+   glScaled(r*2.0,r,r*2.0);
+   //  Head & Tail
+   glColor3f(1,1,1);
+
+   glBegin(GL_QUADS);
+   glNormal3f( 0, 0, 1);
+   glTexCoord2f(0,0); glVertex3f(-1, 0, 1);
+   glTexCoord2f(1,0); glVertex3f(+1, 0, 1);
+   glTexCoord2f(1,1); glVertex3f(+1,+2, 1);
+   glTexCoord2f(0,1); glVertex3f(-1,+2, 1);
+   glEnd();
+   //  Back
+   glBindTexture(GL_TEXTURE_2D,texture[0]);
+   glBegin(GL_QUADS);
+   glNormal3f( 0, 0,-1);
+   glTexCoord2f(0,0); glVertex3f(+1, 0,-1);
+   glTexCoord2f(1,0); glVertex3f(-1, 0,-1);
+   glTexCoord2f(1,1); glVertex3f(-1,+2,-1);
+   glTexCoord2f(0,1); glVertex3f(+1,+2,-1);
+   glEnd();
+   //  Right
+   glBindTexture(GL_TEXTURE_2D,texture[0]);
+   glBegin(GL_QUADS);
+   glNormal3f(+1, 0, 0);
+   glTexCoord2f(0,0); glVertex3f(+1, 0,+1);
+   glTexCoord2f(1,0); glVertex3f(+1, 0,-1);
+   glTexCoord2f(1,1); glVertex3f(+1,+2,-1);
+   glTexCoord2f(0,1); glVertex3f(+1,+2,+1);
+   glEnd();
+   //  Left
+   glBindTexture(GL_TEXTURE_2D,texture[0]);
+   glBegin(GL_QUADS);
+   glNormal3f(-1, 0, 0);
+   glTexCoord2f(0,0); glVertex3f(-1, 0,-1);
+   glTexCoord2f(1,0); glVertex3f(-1, 0,+1);
+   glTexCoord2f(1,1); glVertex3f(-1,+2,+1);
+   glTexCoord2f(0,1); glVertex3f(-1,+2,-1);
+   glEnd();
+   //  Top
+   glColor3f(0.7,0.7,0.7);
+   glBindTexture(GL_TEXTURE_2D,texture[0]);
+   glBegin(GL_QUADS);
+   glNormal3f( 0,+1, 0);
+   glTexCoord2f(0,0); glVertex3f(-1,+2,+1);
+   glTexCoord2f(1,0); glVertex3f(+1,+2,+1);
+   glTexCoord2f(1,1); glVertex3f(+1,+2,-1);
+   glTexCoord2f(0,1); glVertex3f(-1,+2,-1);
+   glEnd();
+   //  Bottom
+   glBindTexture(GL_TEXTURE_2D,texture[0]);
+   glBegin(GL_QUADS);
+   glNormal3f( 0,-1, 0);
+   glTexCoord2f(0,0); glVertex3f(-1, 0,-1);
+   glTexCoord2f(1,0); glVertex3f(+1, 0,-1);
+   glTexCoord2f(1,1); glVertex3f(+1, 0,+1);
+   glTexCoord2f(0,1); glVertex3f(-1, 0,+1);
+   glEnd();
+   //  Undo transformations
+   glPopMatrix();
+   glDisable(GL_TEXTURE_2D);
+
+
+//   //  DRAW GROUND FIXTURE
+//   //  Save transformation
+//   glPushMatrix();
+//   //  Offset, scale and rotate
+//   glTranslated(x,y-d,z);
+//   glScaled(r*2.0,r,r*2.0);
+//   //  White ball
+//   glColor3f(0.1,0.1,0.1);
+//   glutSolidSphere(1.0,16,16);
+//   //  Undo transofrmations
+//   glPopMatrix();
+
+//   int ball_th,ball_ph;
+//   int inc=10;
+//   float yellow[] = {1.0,1.0,0.0,1.0};
+//   float Emission[]  = {0.0,0.0,0.01*emission,1.0};
+//   //  Save transformation
+//   glPushMatrix();
+//   //  Offset, scale and rotate
+//   glTranslated(x,y-d,z);
+//   glScaled(r*2.0,r*2.0,r*2.0);
+//   //  White ball
+//   glColor3f(1,1,1);
+//   glMaterialf(GL_FRONT,GL_SHININESS,shiny);
+//   glMaterialfv(GL_FRONT,GL_SPECULAR,yellow);
+//   glMaterialfv(GL_FRONT,GL_EMISSION,Emission);
+//   //  Bands of latitude
+//   for (ball_ph=-90;ball_ph<90;ball_ph+=inc)
+//   {
+//      glBegin(GL_QUAD_STRIP);
+//      for (ball_th=0;ball_th<=360;ball_th+=2*inc)
+//      {
+//         Vertex(ball_th,ball_ph);
+//         Vertex(ball_th,ball_ph+inc);
+//      }
+//      glEnd();
+//   }
+
+   
+   int ball_th,ball_ph;
+  /* glPushMatrix();
+   glTranslated(x,y-d,z);
+   glScaled(r*2.0,r*2.0,r*2.0);
+   glEnable(GL_TEXTURE_2D);
+   glBindTexture(GL_TEXTURE_2D,texture[0]);
+   //  Latitude bands
+   glColor3f(1,1,1);
+   for (ball_ph=-90;ball_ph<90;ball_ph+=5)
+   {
+      glBegin(GL_QUAD_STRIP);
+      for (ball_th=0;ball_th<=360;ball_th+=5)
+      {
+         Vertex(ball_th,ball_ph);
+         Vertex(ball_th,ball_ph+5);
+      }
+      glEnd();
+   }
+   //  Undo transofrmations
+   glPopMatrix();
+   */
+
+
+   //  DRAW LIGHT
+   int inc=10;
+   float yellow[] = {1.0,1.0,0.0,1.0};
+   float Emission[]  = {0.0,0.0,0.01*emission,1.0};
+   //  Save transformation
+   glPushMatrix();
+   //  Offset, scale and rotate
+   glTranslated(x,y+d-r,z+(d));
+   glScaled(r*2.0,r,r*2.0);
+   //  White ball
+   glColor3f(1,1,1);
+   glMaterialf(GL_FRONT,GL_SHININESS,shiny);
+   glMaterialfv(GL_FRONT,GL_SPECULAR,yellow);
+   glMaterialfv(GL_FRONT,GL_EMISSION,Emission);
+   //  Bands of latitude
+   for (ball_ph=-90;ball_ph<90;ball_ph+=inc)
+   {
+      glBegin(GL_QUAD_STRIP);
+      for (ball_th=0;ball_th<=360;ball_th+=2*inc)
+      {
+         Vertex(ball_th,ball_ph);
+         Vertex(ball_th,ball_ph+inc);
+      }
+      glEnd();
+   }
+   //  Undo transofrmations
+   glPopMatrix();
+}
+
+/*
  *  Draw sky box
  */
 static void Sky(double D)
@@ -854,6 +1117,35 @@ static void ball(double x,double y,double z,double r)
    glPopMatrix();
 }
 
+static void spotlight(double x, double y, double z)
+{
+   //  Translate intensity to color vectors
+   float Ambient[]   = {0.01*ambient ,0.01*ambient ,0.01*ambient ,1.0};
+   float Diffuse[]   = {0.01*diffuse ,0.01*diffuse ,0.01*diffuse ,1.0};
+   float Specular[]  = {0.01*specular,0.01*specular,0.01*specular,1.0};
+   //  Light direction
+   float Position[]  = {x,y,z,1};
+   //  Draw light position as ball (still no lighting here)
+   glColor3f(1,1,1);
+   ball(Position[0],Position[1],Position[2] , 0.1);
+   //  OpenGL should normalize normal vectors
+   glEnable(GL_NORMALIZE);
+   //  Enable lighting
+   glEnable(GL_LIGHTING);
+   //  Two sided lighting on or off
+   glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,side);
+   //  glColor sets ambient and diffuse color materials
+   glColorMaterial(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE);
+   glEnable(GL_COLOR_MATERIAL);
+   //  Enable light 0
+   glEnable(GL_LIGHT0);
+   //  Set ambient, diffuse, specular components and position of light 0
+   glLightfv(GL_LIGHT0,GL_AMBIENT ,Ambient);
+   glLightfv(GL_LIGHT0,GL_DIFFUSE ,Diffuse);
+   glLightfv(GL_LIGHT0,GL_SPECULAR,Specular);
+   glLightfv(GL_LIGHT0,GL_POSITION,Position);
+}
+
 /*
  *  OpenGL (GLUT) calls this routine to display the scene
  */
@@ -908,14 +1200,14 @@ void display()
    //  Draw scene
    car_with_reflection(-5.7+movement_x,0,0.7 , 0.05,0.05,0.05, 0  , tire_rot, 205,150,10);  // yellow car
    car_with_reflection(+5.7-movement_x,0,-0.7, 0.05,0.05,0.05, 180, tire_rot, 205,15,10);  // red car
-   
+
    building_with_reflection(3, -6.7,0,-4.2, 2.1,2.6,2.1, 0);    //  building 3 concrete/glass
    building_with_reflection(0, -2.7,0,-2.7, 1,1,1, 0);          //  building 0 brick storefront
    building_with_reflection(1, 0,0,-3.2, 1.3,1.3,1.3, 0);       //  building 1 yellow building glass storefront
    building_with_reflection(2, 2.7,0,-2.7, 1.3,1.3,1.3, 0);     //  building 2 old white/yellow/brown building
    building_with_reflection(1, 5.7,0,-3.5, 1.3,1.3,1.3, 0);       //  building 1 yellow building glass storefront
    building_with_reflection(3, 9.7,0,-4.2, 2.1,2.6,2.1, 0);    //  building 3 concrete/glass
-   
+
    road(    0,0 ,0  , 1,1, 0, rep);
    water(0,0, 2.6, 1,3, 0, rep);
    sidewalk(0,0,-2.6, 1,1, 0, rep);
@@ -927,6 +1219,9 @@ void display()
    road(    8,0 ,0  , 1,1, 0, rep);
    water(8,0, 2.6, 1,3, 0, rep);
    sidewalk(8,0,-2.6, 1,1, 0, rep);
+
+   street_light(0,1,0, 0.05,1, 0);
+   //spotlight(0,0,0);
 
    //  Draw axes - no lighting from here on
    glDisable(GL_LIGHTING);
