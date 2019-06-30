@@ -48,7 +48,7 @@ unsigned int building_texture[4];
 int box=1;	//  Draw sky
 int sky[2];	//  Sky textures
 //  Movement
-double speed=4;
+double speed=0;
 double movement_x=0;
 double movement_x_thresh=56;
 double tire_rot=0;
@@ -802,6 +802,7 @@ static void Vertex(double th,double ph)
 {
    y = 1+y;
    int i,k;
+   float street_light_color[] = {0.2,0.2,0.2};
    //  DRAW BASE
    glEnable(GL_TEXTURE_2D);
    //  Save transformation
@@ -811,10 +812,10 @@ static void Vertex(double th,double ph)
    glRotated(90,1,0,0);
    glScaled(r,r,d);
    //  Head & Tail
-   glColor3f(1,1,1);
+   glColor3fv(street_light_color);
    for (i=1;i>=-1;i-=2)
    {
-      glBindTexture(GL_TEXTURE_2D,texture[0]);
+      glBindTexture(GL_TEXTURE_2D,car_texture[5]);
       glNormal3f(0,0,i);
       glBegin(GL_TRIANGLE_FAN);
       glTexCoord2f(0.5,0.5);
@@ -827,8 +828,8 @@ static void Vertex(double th,double ph)
       glEnd();
    }
    //  Edge
-   glBindTexture(GL_TEXTURE_2D,texture[0]);
-   glColor3f(1,1,1);
+   glBindTexture(GL_TEXTURE_2D,car_texture[5]);
+   glColor3fv(street_light_color);
    glBegin(GL_QUAD_STRIP);
    for (k=0;k<=360;k+=10)
    {
@@ -850,10 +851,10 @@ static void Vertex(double th,double ph)
    glTranslated(x,y+d,z+(d/2.0));
    glScaled(r,r,d/2.0);
    //  Head & Tail
-   glColor3f(1,1,1);
+   glColor3fv(street_light_color);
    for (i=1;i>=-1;i-=2)
    {
-      glBindTexture(GL_TEXTURE_2D,texture[0]);
+      glBindTexture(GL_TEXTURE_2D,car_texture[5]);
       glNormal3f(0,0,i);
       glBegin(GL_TRIANGLE_FAN);
       glTexCoord2f(0.5,0.5);
@@ -866,8 +867,8 @@ static void Vertex(double th,double ph)
       glEnd();
    }
    //  Edge
-   glBindTexture(GL_TEXTURE_2D,texture[0]);
-   glColor3f(1,1,1);
+   glBindTexture(GL_TEXTURE_2D,car_texture[5]);
+   glColor3fv(street_light_color);
    glBegin(GL_QUAD_STRIP);
    for (k=0;k<=360;k+=10)
    {
@@ -889,7 +890,7 @@ static void Vertex(double th,double ph)
    glTranslated(x,y+d-(r),z+(d));
    glScaled(r*2.0,r,r*2.0);
    //  Head & Tail
-   glColor3f(1,1,1);
+   glColor3fv(street_light_color);
 
    glBegin(GL_QUADS);
    glNormal3f( 0, 0, 1);
@@ -899,7 +900,7 @@ static void Vertex(double th,double ph)
    glTexCoord2f(0,1); glVertex3f(-1,+2, 1);
    glEnd();
    //  Back
-   glBindTexture(GL_TEXTURE_2D,texture[0]);
+   glBindTexture(GL_TEXTURE_2D,car_texture[5]);
    glBegin(GL_QUADS);
    glNormal3f( 0, 0,-1);
    glTexCoord2f(0,0); glVertex3f(+1, 0,-1);
@@ -908,7 +909,7 @@ static void Vertex(double th,double ph)
    glTexCoord2f(0,1); glVertex3f(+1,+2,-1);
    glEnd();
    //  Right
-   glBindTexture(GL_TEXTURE_2D,texture[0]);
+   glBindTexture(GL_TEXTURE_2D,car_texture[5]);
    glBegin(GL_QUADS);
    glNormal3f(+1, 0, 0);
    glTexCoord2f(0,0); glVertex3f(+1, 0,+1);
@@ -917,7 +918,7 @@ static void Vertex(double th,double ph)
    glTexCoord2f(0,1); glVertex3f(+1,+2,+1);
    glEnd();
    //  Left
-   glBindTexture(GL_TEXTURE_2D,texture[0]);
+   glBindTexture(GL_TEXTURE_2D,car_texture[5]);
    glBegin(GL_QUADS);
    glNormal3f(-1, 0, 0);
    glTexCoord2f(0,0); glVertex3f(-1, 0,-1);
@@ -926,8 +927,7 @@ static void Vertex(double th,double ph)
    glTexCoord2f(0,1); glVertex3f(-1,+2,-1);
    glEnd();
    //  Top
-   glColor3f(0.7,0.7,0.7);
-   glBindTexture(GL_TEXTURE_2D,texture[0]);
+   glBindTexture(GL_TEXTURE_2D,car_texture[5]);
    glBegin(GL_QUADS);
    glNormal3f( 0,+1, 0);
    glTexCoord2f(0,0); glVertex3f(-1,+2,+1);
@@ -936,7 +936,7 @@ static void Vertex(double th,double ph)
    glTexCoord2f(0,1); glVertex3f(-1,+2,-1);
    glEnd();
    //  Bottom
-   glBindTexture(GL_TEXTURE_2D,texture[0]);
+   glBindTexture(GL_TEXTURE_2D,car_texture[5]);
    glBegin(GL_QUADS);
    glNormal3f( 0,-1, 0);
    glTexCoord2f(0,0); glVertex3f(-1, 0,-1);
@@ -952,8 +952,6 @@ static void Vertex(double th,double ph)
    //  DRAW LIGHT
    int ball_th,ball_ph;
    int inc=10;
-   float white[] = {1.0,1.0,1.0,1.0};
-   float Emission[]  = {0.5,0.5,0.9,1.0};
    //  Save transformation
    glPushMatrix();
    //  Offset, scale and rotate
@@ -961,9 +959,6 @@ static void Vertex(double th,double ph)
    glScaled(r*2.0,r,r*2.0);
    //  White ball
    glColor3f(1,1,1);
-   glMaterialf(GL_FRONT,GL_SHININESS,shiny);
-   glMaterialfv(GL_FRONT,GL_SPECULAR,white);
-   glMaterialfv(GL_FRONT,GL_EMISSION,Emission);
    //  Bands of latitude
    for (ball_ph=-90;ball_ph<90;ball_ph+=inc)
    {
@@ -1169,14 +1164,24 @@ void display()
       //  Cars
       car_with_reflection(0,0,-0.45, 0.04,0.04,0.04, 180, tire_rot, 255,115, 10);  // orange car
       //  Surroundings
-      cityBlock(-84+movement_x,0,0);  cityBlock(-84+movement_x,0,-12);  cityBlock(-84+movement_x,0,-24);  water(-84+movement_x,0,16, 0, rep);
-      cityBlock(-70+movement_x,0,0);  cityBlock(-70+movement_x,0,-12);  cityBlock(-70+movement_x,0,-24);  water(-70+movement_x,0,16, 0, rep);
-      cityBlock(-56+movement_x,0,0);  cityBlock(-56+movement_x,0,-12);  cityBlock(-56+movement_x,0,-24);  water(-56+movement_x,0,16, 0, rep);
-      cityBlock(-42+movement_x,0,0);  cityBlock(-42+movement_x,0,-12);  cityBlock(-42+movement_x,0,-24);  water(-42+movement_x,0,16, 0, rep);
-      cityBlock(-28+movement_x,0,0);  cityBlock(-28+movement_x,0,-12);  cityBlock(-28+movement_x,0,-24);  water(-28+movement_x,0,16, 0, rep);
-      cityBlock(-14+movement_x,0,0);  cityBlock(-14+movement_x,0,-12);  cityBlock(-14+movement_x,0,-24);  water(-14+movement_x,0,16, 0, rep);
-      cityBlock( 14+movement_x,0,0);  cityBlock( 14+movement_x,0,-12);  cityBlock( 14+movement_x,0,-24);  water( 14+movement_x,0,16, 0, rep);
-      cityBlock(  0+movement_x,0,0);  cityBlock(  0+movement_x,0,-12);  cityBlock(  0+movement_x,0,-24);  water(  0+movement_x,0,16, 0, rep);
+      cityBlock(-84+movement_x,0,0);  cityBlock(-84+movement_x,0,-12);  cityBlock(-84+movement_x,0,-24);
+      cityBlock(-70+movement_x,0,0);  cityBlock(-70+movement_x,0,-12);  cityBlock(-70+movement_x,0,-24); 
+      cityBlock(-56+movement_x,0,0);  cityBlock(-56+movement_x,0,-12);  cityBlock(-56+movement_x,0,-24); 
+      cityBlock(-42+movement_x,0,0);  cityBlock(-42+movement_x,0,-12);  cityBlock(-42+movement_x,0,-24); 
+      cityBlock(-28+movement_x,0,0);  cityBlock(-28+movement_x,0,-12);  cityBlock(-28+movement_x,0,-24); 
+      cityBlock(-14+movement_x,0,0);  cityBlock(-14+movement_x,0,-12);  cityBlock(-14+movement_x,0,-24); 
+      cityBlock( 14+movement_x,0,0);  cityBlock( 14+movement_x,0,-12);  cityBlock( 14+movement_x,0,-24); 
+      cityBlock(  0+movement_x,0,0);  cityBlock(  0+movement_x,0,-12);  cityBlock(  0+movement_x,0,-24); 
+      
+      //  Draw Water last or else reflections won't show on some waters
+      water(-84+movement_x,0,16, 0, rep);
+      water(-70+movement_x,0,16, 0, rep);
+      water(-56+movement_x,0,16, 0, rep);
+      water(-42+movement_x,0,16, 0, rep);
+      water(-28+movement_x,0,16, 0, rep);
+      water(-14+movement_x,0,16, 0, rep);
+      water( 14+movement_x,0,16, 0, rep);
+      water(  0+movement_x,0,16, 0, rep);
    }   else
    {
       //  Cars
