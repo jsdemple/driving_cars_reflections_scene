@@ -52,8 +52,10 @@ double speed=4;
 double movement_x=0;
 double movement_x_thresh=56;
 double tire_rot=0;
-//  Mode: 0=Passing Cars, 1=Passing City Blocks
-int mode=0;
+//  Mode: 0=PassingCars, 1=FollowCar
+int mode=1;
+//  Fog
+int fog=0;
 
 
 /*
@@ -1191,7 +1193,21 @@ void display()
       cityBlock( 14,0,0);  cityBlock( 14,0,-12);  cityBlock( 14,0,-24);  water( 14,0,16, 0, rep);
       cityBlock(  0,0,0);  cityBlock(  0,0,-12);  cityBlock(  0,0,-24);  water(  0,0,16, 0, rep);
    }
-
+   
+   //  Fog
+   /*  Fog Code borrowed from https://users.cs.jmu.edu/bernstdh/web/common/lectures/slides_opengl-fog.php  */
+   if (fog)
+   {
+      float colorGray[] = {0.5, 0.5, 0.5, 0.5};
+      glEnable(GL_FOG);
+      {
+         glFogi(GL_FOG_MODE,    GL_EXP);
+         glFogfv(GL_FOG_COLOR,  colorGray);
+         glFogf(GL_FOG_DENSITY, 0.035);      
+      }
+      glClearColor(colorGray[0], colorGray[1], colorGray[2], colorGray[3]);
+   }
+   
    //  Draw axes - no lighting from here on
    glDisable(GL_LIGHTING);
    glColor3f(1,1,1);
@@ -1215,11 +1231,11 @@ void display()
    }
    //  Display parameters
    glWindowPos2i(5,5);
-   Print("Angle=%d,%d  Dim=%.1f Light=%s Movement=%.1f Speed=%.1f",th,ph,dim,light?"On":"Off",movement_x,speed);
+   Print("Angle=%d,%d  Dim=%.1f Light=%s Fog=%s",th,ph,dim,light?"On":"Off",fog?"On":"Off");
    if (light)
    {
       glWindowPos2i(5,25);
-      Print("Ambient=%d  Diffuse=%d Specular=%d Emission=%d Shininess=%.0f",ambient,diffuse,specular,emission,shiny);
+      Print("Animation=%s  MovementPos=%.1f MovementSpeed=%.1f",mode?"FollowCar":"StayPut",movement_x,speed);
    }
    //  Render the scene and make it visible
    ErrCheck("display");
@@ -1341,6 +1357,9 @@ void key(unsigned char ch,int x,int y)
       shininess -= 1;
    else if (ch=='N' && shininess<7)
       shininess += 1;
+   //  Toggle Fog
+   else if (ch=='f' || ch=='F')
+      fog = 1-fog; 
    //  Repitition
    else if (ch=='+')
       rep++;
