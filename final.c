@@ -48,10 +48,12 @@ unsigned int building_texture[4];
 int box=1;	//  Draw sky
 int sky[2];	//  Sky textures
 //  Movement
-double speed=0;
+double speed=15;
 double movement_x=0;
 double movement_x_thresh=56;
 double tire_rot=0;
+double to_mph_adjuster=3.0;
+double speed_limit=100;
 //  Mode: 0=PassingCars, 1=FollowCar
 int mode=1;
 //  Fog
@@ -97,6 +99,11 @@ static void car(double x, double y, double z,
 				      {front_axel_pos, axel_height, body_width+tire_protrusion},  //  passenger front
 				      {rear_axel_pos,  axel_height, -body_width-tire_protrusion},  //  driver rear
 	                             };
+   //  Other
+   const double mirror_width=0.2;
+   const double mirror_length=0.1;
+   const double mirror_height=0.1;
+
    /*  Begin Drawing Car  */
    //  Save Transformation
    glPushMatrix();
@@ -1078,33 +1085,9 @@ static void ball(double x,double y,double z,double r)
    glPopMatrix();
 }
 
-static void spotlight(double x, double y, double z)
+static double speed_to_mph(double abstract_speed)
 {
-   //  Translate intensity to color vectors
-   float Ambient[]   = {0.01*ambient ,0.01*ambient ,0.01*ambient ,1.0};
-   float Diffuse[]   = {0.01*diffuse ,0.01*diffuse ,0.01*diffuse ,1.0};
-   float Specular[]  = {0.01*specular,0.01*specular,0.01*specular,1.0};
-   //  Light direction
-   float Position[]  = {x,y,z,1};
-   //  Draw light position as ball (still no lighting here)
-   glColor3f(1,1,1);
-   ball(Position[0],Position[1],Position[2] , 0.1);
-   //  OpenGL should normalize normal vectors
-   glEnable(GL_NORMALIZE);
-   //  Enable lighting
-   glEnable(GL_LIGHTING);
-   //  Two sided lighting on or off
-   glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,side);
-   //  glColor sets ambient and diffuse color materials
-   glColorMaterial(GL_FRONT_AND_BACK,GL_AMBIENT_AND_DIFFUSE);
-   glEnable(GL_COLOR_MATERIAL);
-   //  Enable light 0
-   glEnable(GL_LIGHT0);
-   //  Set ambient, diffuse, specular components and position of light 0
-   glLightfv(GL_LIGHT0,GL_AMBIENT ,Ambient);
-   glLightfv(GL_LIGHT0,GL_DIFFUSE ,Diffuse);
-   glLightfv(GL_LIGHT0,GL_SPECULAR,Specular);
-   glLightfv(GL_LIGHT0,GL_POSITION,Position);
+   return abstract_speed * to_mph_adjuster;
 }
 
 /*
@@ -1163,6 +1146,95 @@ void display()
    {
       //  Cars
       car_with_reflection(0,0,-0.45, 0.04,0.04,0.04, 180, tire_rot, 255,115, 10);  // orange car
+
+      //  Cars
+      double mph=speed_to_mph(speed);
+      if (mph > speed_limit)
+      {
+         car_with_reflection(+5,0,-0.45, 0.04,0.04,0.04, 180, tire_rot, 250,250,250);  // police car
+         // Police Lights
+	 double x=5;
+	 double y=0.35;
+	 double z=-0.45;
+	 double dx=0.04;
+	 double dy=0.03;
+	 double dz=0.12;
+	 float red_light[] =  {1.0,0,0};
+	 float blue_light[] = {0,0,1.0};
+	 glPushMatrix();
+	 glEnable(GL_TEXTURE_2D);
+	 glTranslated(x,y,z);
+	 glScaled(dx,dy,dz);
+
+         int i;
+         for (i=-1;i<2;i+=2)
+         {
+         glPushMatrix();
+	 glTranslated(0,0,i);
+	 if (i<0) {glColor3fv(blue_light);}
+         else {glColor3fv(red_light);}
+	 glBegin(GL_QUADS);
+	 glNormal3f(0,0,1);
+	 glTexCoord2f(0,0); glVertex3f(-1, 0, 1);
+         glTexCoord2f(1,0); glVertex3f(+1, 0, 1);
+	 glTexCoord2f(1,1); glVertex3f(+1,+2, 1);
+	 glTexCoord2f(0,1); glVertex3f(-1,+2, 1);
+	 glEnd();
+	 //  Back
+	 glBindTexture(GL_TEXTURE_2D,car_texture[5]);
+	 glBegin(GL_QUADS);
+	 glNormal3f( 0, 0,-1);
+	 glTexCoord2f(0,0); glVertex3f(+1, 0,-1);
+	 glTexCoord2f(1,0); glVertex3f(-1, 0,-1);
+	 glTexCoord2f(1,1); glVertex3f(-1,+2,-1);
+	 glTexCoord2f(0,1); glVertex3f(+1,+2,-1);
+	 glEnd();
+	 //  Right
+	 glBindTexture(GL_TEXTURE_2D,car_texture[5]);
+	 glBegin(GL_QUADS);
+	 glNormal3f(+1, 0, 0);
+	 glTexCoord2f(0,0); glVertex3f(+1, 0,+1);
+	 glTexCoord2f(1,0); glVertex3f(+1, 0,-1);
+	 glTexCoord2f(1,1); glVertex3f(+1,+2,-1);
+	 glTexCoord2f(0,1); glVertex3f(+1,+2,+1);
+	 glEnd();
+	 //  Left
+	 glBindTexture(GL_TEXTURE_2D,car_texture[5]);
+	 glBegin(GL_QUADS);
+	 glNormal3f(-1, 0, 0);
+	 glTexCoord2f(0,0); glVertex3f(-1, 0,-1);
+	 glTexCoord2f(1,0); glVertex3f(-1, 0,+1);
+	 glTexCoord2f(1,1); glVertex3f(-1,+2,+1);
+	 glTexCoord2f(0,1); glVertex3f(-1,+2,-1);
+	 glEnd();
+	 //  Top
+	 glBindTexture(GL_TEXTURE_2D,car_texture[5]);
+	 glBegin(GL_QUADS);
+	 glNormal3f( 0,+1, 0);
+	 glTexCoord2f(0,0); glVertex3f(-1,+2,+1);
+	 glTexCoord2f(1,0); glVertex3f(+1,+2,+1);
+	 glTexCoord2f(1,1); glVertex3f(+1,+2,-1);
+	 glTexCoord2f(0,1); glVertex3f(-1,+2,-1);
+	 glEnd();
+	 //  Bottom
+	 glBindTexture(GL_TEXTURE_2D,car_texture[5]);
+	 glBegin(GL_QUADS);
+	 glNormal3f( 0,-1, 0);
+	 glTexCoord2f(0,0); glVertex3f(-1, 0,-1);
+	 glTexCoord2f(1,0); glVertex3f(+1, 0,-1);
+	 glTexCoord2f(1,1); glVertex3f(+1, 0,+1);
+	 glTexCoord2f(0,1); glVertex3f(-1, 0,+1);
+	 glEnd();
+	 //  Undo transformations
+	 glPopMatrix();
+	 glDisable(GL_TEXTURE_2D);
+	 }
+
+	 glPopMatrix();
+      
+         
+       }
+      
       //  Surroundings
       cityBlock(-84+movement_x,0,0);  cityBlock(-84+movement_x,0,-12);  cityBlock(-84+movement_x,0,-24);
       cityBlock(-70+movement_x,0,0);  cityBlock(-70+movement_x,0,-12);  cityBlock(-70+movement_x,0,-24); 
@@ -1235,14 +1307,25 @@ void display()
       Print("Z");
    }
    //  Display parameters
+   double mph=speed_to_mph(speed);
    glWindowPos2i(5,5);
    Print("Angle=%d,%d  Dim=%.1f Light=%s Fog=%s",th,ph,dim,light?"On":"Off",fog?"On":"Off");
    if (light)
    {
       glWindowPos2i(5,25);
-      Print("Animation=%s  MovementPos=%.1f MovementSpeed=%.1f",mode?"FollowCar":"StayPut",movement_x,speed);
+      Print("Animation=%s  MovementPos=%.1f SpeedMPH=%.1f",mode?"FollowCar":"StayPut",speed,mph);
    }
-   //  Render the scene and make it visible
+   if (mph < speed_limit)
+   {
+      glWindowPos2i(5,45);
+      Print("WARNING: DO NOT EXCEED %d MPH",speed_limit);
+   }
+   else
+   {
+      glWindowPos2i(5,45);
+      Print("PULL OVER NOW!!!");
+   }
+//  Render the scene and make it visible
    ErrCheck("display");
    glFlush();
    glutSwapBuffers();
