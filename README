@@ -9,12 +9,9 @@ run: `make -f makefile`
 OPERATE
  *  +/-        Increase/decrease texture tiling repetition on the ground
  *  l          Toggle lighting on/off
- *  m          Toggles texture mode modulate/replace
- *  a/A        decrease/increase ambient light
- *  d/D        decrease/increase diffuse light
- *  s/S        decrease/increase specular light
- *  e/E        decrease/increase emitted light
- *  n/N        Decrease/increase shininess
+ *  m          Toggles Animation mode
+ *  s/S        decrease/increase Speed of movement
+ *  f/F	       Toggle Fog on/off
  *  []         Lower/rise light
  *  x          Toggle axes
  *  arrows     Change view angle
@@ -23,7 +20,7 @@ OPERATE
  *  ESC        Exit
 
 TIME TO COMPLETE
-This took me roughly 16 hours
+This took me roughly 36 hours
 
 ACKNOWLEDGEMENTS
 - asphalt texture from https://www.123rf.com/photo_97376423_asphalt-background-asphalt-texture-black-road-surface-.html
