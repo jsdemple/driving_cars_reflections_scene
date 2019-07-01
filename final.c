@@ -1019,6 +1019,17 @@ static void Vertex(double th,double ph)
 }
 
 /*
+ *  Draw a speed limit sign
+ */
+ static void speed_limit_sign(double x, double y, double z,
+                              double r, double d,
+                              double th)
+{
+   speed_limit_sign(x,y,z, r,d, th);
+   speed_limit_sign(x,y,z, r,d, th);
+}
+
+/*
  *  Draw a street light
  *     at (x,y,z)
  *     dimensions (dx,dy,dz)
