@@ -1,22 +1,29 @@
-Joey Demple 5229 - hw3
+Joey Demple 5229 - Final Project
 
-SPORTS CAR LIGHTING AND TEXTURE SCENE
-Two sportscars modeled after the Ferrari Testarossa pass one another on a road with the sea and mountains in the background. This scene uses textures for almost every surface. I did not see any reason to put a texture on the roof of the car or the yellow lines on the pavement. Textures which have been borrowed (under fair use) are given attribution in the Acknowledgements section. All textures for the car body were drawn by me by hand. The windsheilds and windows use a subtle glass texture. The background is a sky cube showcasing a sea and mountain background. My next steps would include adding details to the car, some animation like wheels spinning while the car moves, and storefronts or buildings on one or both sides of the road. Adding reflectivity to the car's surfaces or having a highly reflective glass office building on one side of the road would be great.
+SPORTS CAR ON THE LAKEFRONT SCENE
+This scene features two animations, one where the viewer pans across the lake alongside an orange sportscar while the car and the city scene behind it can be seen in the water's reflection in the foreground. The other animation features a stationary view in relation to the scene and cars driving by on both sides. Press m to toggle between these animation modes.
+
+In both animations the vehicles' speed can be decreased/increased using s/S. Excessive speeds in the FollowCar mode may lead to run-ins with the law!
+Part of the challenge for this was making the FollowCar loop imperceptable. In order to do this I had to redraw almost all of my objects since I made some poor choices in how I drew them earlier. I found the most useful thing to be setting a global unit length and then having every dimension of every object (almost every) be in multiples of that unit length. This enabled me to create a cityBlock function that draws a block of 8 buildings, a street and a cross street, and street lights. The water in the foreground is the same length as these city blocks, however I found that I needed to draw all waters AFTER drawing all city blocks or I would have some water sections blocking the reflection of the buildings at far angles. 
+
+Reflections on the water are created by drawing each object that should be reflected once more, but with the y dimension inverted. The water object is slightly opaque making the reflection slightly washed out as it should be.
+
+There is a fog mode available by pressing f. I would like to caveat this with the fact that on my machine (with my measly integrated graphics) the fog destroys my frame rate. I left the fog mode in because I am not sure if this would work with a decent graphics card or whether the problem is in my code. I think it really improves the scene by blending the further objects into the horizon more smoothly. I hope it works well on a machine with better capabilities.
+
+WHAT REMAINS TO BE DONE
+I am going to add a few more details to the city blocks and the possibly the car. If I have time I would like to clean up the StayPut loop to make it loop perfectly. 
+
 
 COMPILE
 run: `make -f makefile`
 
 OPERATE
- *  +/-        Increase/decrease texture tiling repetition on the ground
- *  l          Toggle lighting on/off
- *  m          Toggles Animation mode
+ *  m          Toggle Animation mode (FollowCar or StayPut)
  *  s/S        decrease/increase Speed of movement
  *  f/F	       Toggle Fog on/off
  *  []         Lower/rise light
- *  x          Toggle axes
  *  arrows     Change view angle
  *  PgDn/PgUp  Zoom in and out
- *  0          Reset view angle
  *  ESC        Exit
 
 TIME TO COMPLETE
@@ -34,7 +41,8 @@ ACKNOWLEDGEMENTS
 - building1 from http://softwaremonster.info/?w=dryvit+stores+near
 - building2 from http://texturelib.com/#!/category/?path=/Textures/buildings/buildings
 - building3 from https://downloadtexture.com/textures-of-facades-of-office-buildings.html
+- Code for fog borrowed from from https://users.cs.jmu.edu/bernstdh/web/common/lectures/slides_opengl-fog.php
+- Reflection idea borrowed from https://www.opengl.org/archives/resources/code/samples/glut_examples/examples/dinoshade.c
+- This project borrows from many of the course examples including, but not necessary limited to ex: 10,13,14,15,19
 
-USEFUL FOR ME TO REMEMBER
-- Command to reformat as 24 bit pixels instead of 32 on BMP files: convert asphalt.bmp -type truecolor asphalt.bmp
 

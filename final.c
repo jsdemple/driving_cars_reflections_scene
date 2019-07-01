@@ -48,7 +48,7 @@ unsigned int building_texture[4];
 int box=1;	//  Draw sky
 int sky[2];	//  Sky textures
 //  Movement
-double speed=45;
+double speed=10;
 double movement_x=0;
 double movement_x_thresh=56;
 double tire_rot=0;
@@ -1336,7 +1336,7 @@ void display()
    //  Display parameters
    double mph=speed_to_mph(speed);
    glWindowPos2i(5,5);
-   Print("Angle=%d,%d  Dim=%.1f Light=%s Fog=%s",th,ph,dim,light?"On":"Off",fog?"On":"Off");
+   Print("Angle=%d,%d  Dim=%.1f Fog=%s",th,ph,dim,fog?"On":"Off");
    if (light)
    {
       glWindowPos2i(5,25);
