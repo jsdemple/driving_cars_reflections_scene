@@ -48,12 +48,15 @@ unsigned int building_texture[4];
 int box=1;	//  Draw sky
 int sky[2];	//  Sky textures
 //  Movement
-double speed=15;
+double speed=45;
 double movement_x=0;
 double movement_x_thresh=56;
 double tire_rot=0;
 double to_mph_adjuster=3.0;
 double speed_limit=100;
+int police_light_switch=0;
+int police_light_interval=5;
+double time;
 //  Mode: 0=PassingCars, 1=FollowCar
 int mode=1;
 //  Fog
@@ -450,6 +453,109 @@ static void car_with_reflection(double x, double y, double z,
 {
    car(x,y,z, dx,dy,dz,  th, tire_rotation, paint_R,paint_G,paint_B);  //  car
    car(x,y,z, dx,-dy,dz, th, tire_rotation, paint_R,paint_G,paint_B);  //  reflection of car
+}
+
+/*
+ *  Draw Police Lights on car
+ */
+static void police_lights(double x, double y, double z,
+                          double dx,double dy,double dz)
+{
+   // Police Lights
+   float red_light_on[]   = {1.0,0.0,0.0};
+   float red_light_off[]  = {0.3,0.0,0.0};
+   float blue_light_on[]  = {0.1,0.1,1.0};
+   float blue_light_off[] = {0.0,0.0,0.2};
+   glPushMatrix();
+   glEnable(GL_TEXTURE_2D);
+   glTranslated(x,y,z);
+   glScaled(dx,dy,dz);
+   
+   int i;
+   for (i=-1;i<2;i+=2)
+   {
+      glPushMatrix();
+      glTranslated(0,0,i);
+      if (i<0) 
+      {
+         if (police_light_switch == 1) {glColor3fv(blue_light_on);}
+	 else                              {glColor3fv(blue_light_off);}
+      }
+      else 
+      {
+         if (police_light_switch == 0) {glColor3fv(red_light_on);}
+         else                              {glColor3fv(red_light_off);}
+      }
+      //  Front
+      glBegin(GL_QUADS);
+      glNormal3f(0,0,1);
+      glTexCoord2f(0,0); glVertex3f(-1, 0, 1);
+      glTexCoord2f(1,0); glVertex3f(+1, 0, 1);
+      glTexCoord2f(1,1); glVertex3f(+1,+2, 1);
+      glTexCoord2f(0,1); glVertex3f(-1,+2, 1);
+      glEnd();
+      //  Back
+      glBindTexture(GL_TEXTURE_2D,car_texture[5]);
+      glBegin(GL_QUADS);
+      glNormal3f( 0, 0,-1);
+      glTexCoord2f(0,0); glVertex3f(+1, 0,-1);
+      glTexCoord2f(1,0); glVertex3f(-1, 0,-1);
+      glTexCoord2f(1,1); glVertex3f(-1,+2,-1);
+      glTexCoord2f(0,1); glVertex3f(+1,+2,-1);
+      glEnd();
+      //  Right
+      glBindTexture(GL_TEXTURE_2D,car_texture[5]);
+      glBegin(GL_QUADS);
+      glNormal3f(+1, 0, 0);
+      glTexCoord2f(0,0); glVertex3f(+1, 0,+1);
+      glTexCoord2f(1,0); glVertex3f(+1, 0,-1);
+      glTexCoord2f(1,1); glVertex3f(+1,+2,-1);
+      glTexCoord2f(0,1); glVertex3f(+1,+2,+1);
+      glEnd();
+      //  Left
+      glBindTexture(GL_TEXTURE_2D,car_texture[5]);
+      glBegin(GL_QUADS);
+      glNormal3f(-1, 0, 0);
+      glTexCoord2f(0,0); glVertex3f(-1, 0,-1);
+      glTexCoord2f(1,0); glVertex3f(-1, 0,+1);
+      glTexCoord2f(1,1); glVertex3f(-1,+2,+1);
+      glTexCoord2f(0,1); glVertex3f(-1,+2,-1);
+      glEnd();
+      //  Top
+      glBindTexture(GL_TEXTURE_2D,car_texture[5]);
+      glBegin(GL_QUADS);
+      glNormal3f( 0,+1, 0);
+      glTexCoord2f(0,0); glVertex3f(-1,+2,+1);
+      glTexCoord2f(1,0); glVertex3f(+1,+2,+1);
+      glTexCoord2f(1,1); glVertex3f(+1,+2,-1);
+      glTexCoord2f(0,1); glVertex3f(-1,+2,-1);
+      glEnd();
+      //  Bottom
+      glBindTexture(GL_TEXTURE_2D,car_texture[5]);
+      glBegin(GL_QUADS);
+      glNormal3f( 0,-1, 0);
+      glTexCoord2f(0,0); glVertex3f(-1, 0,-1);
+      glTexCoord2f(1,0); glVertex3f(+1, 0,-1);
+      glTexCoord2f(1,1); glVertex3f(+1, 0,+1);
+      glTexCoord2f(0,1); glVertex3f(-1, 0,+1);
+      glEnd();
+      //  Undo transformations
+      glPopMatrix();
+      glDisable(GL_TEXTURE_2D);
+   }
+   
+   glPopMatrix();
+
+}
+
+/*
+ *  Draw Police Lights on car
+ */
+static void police_lights_with_reflection(double x, double y, double z,
+                                          double dx,double dy,double dz)
+{
+   police_lights(x,y,z, dx,+dy,dz);
+   police_lights(x,-y,z, dx,-dy,dz);
 }
 
 /*
@@ -1149,90 +1255,11 @@ void display()
 
       //  Cars
       double mph=speed_to_mph(speed);
-      if (mph > speed_limit)
+      if (mph>speed_limit && mode==1)
       {
          car_with_reflection(+5,0,-0.45, 0.04,0.04,0.04, 180, tire_rot, 250,250,250);  // police car
-         // Police Lights
-	 double x=5;
-	 double y=0.35;
-	 double z=-0.45;
-	 double dx=0.04;
-	 double dy=0.03;
-	 double dz=0.12;
-	 float red_light[] =  {1.0,0,0};
-	 float blue_light[] = {0,0,1.0};
-	 glPushMatrix();
-	 glEnable(GL_TEXTURE_2D);
-	 glTranslated(x,y,z);
-	 glScaled(dx,dy,dz);
-
-         int i;
-         for (i=-1;i<2;i+=2)
-         {
-         glPushMatrix();
-	 glTranslated(0,0,i);
-	 if (i<0) {glColor3fv(blue_light);}
-         else {glColor3fv(red_light);}
-	 glBegin(GL_QUADS);
-	 glNormal3f(0,0,1);
-	 glTexCoord2f(0,0); glVertex3f(-1, 0, 1);
-         glTexCoord2f(1,0); glVertex3f(+1, 0, 1);
-	 glTexCoord2f(1,1); glVertex3f(+1,+2, 1);
-	 glTexCoord2f(0,1); glVertex3f(-1,+2, 1);
-	 glEnd();
-	 //  Back
-	 glBindTexture(GL_TEXTURE_2D,car_texture[5]);
-	 glBegin(GL_QUADS);
-	 glNormal3f( 0, 0,-1);
-	 glTexCoord2f(0,0); glVertex3f(+1, 0,-1);
-	 glTexCoord2f(1,0); glVertex3f(-1, 0,-1);
-	 glTexCoord2f(1,1); glVertex3f(-1,+2,-1);
-	 glTexCoord2f(0,1); glVertex3f(+1,+2,-1);
-	 glEnd();
-	 //  Right
-	 glBindTexture(GL_TEXTURE_2D,car_texture[5]);
-	 glBegin(GL_QUADS);
-	 glNormal3f(+1, 0, 0);
-	 glTexCoord2f(0,0); glVertex3f(+1, 0,+1);
-	 glTexCoord2f(1,0); glVertex3f(+1, 0,-1);
-	 glTexCoord2f(1,1); glVertex3f(+1,+2,-1);
-	 glTexCoord2f(0,1); glVertex3f(+1,+2,+1);
-	 glEnd();
-	 //  Left
-	 glBindTexture(GL_TEXTURE_2D,car_texture[5]);
-	 glBegin(GL_QUADS);
-	 glNormal3f(-1, 0, 0);
-	 glTexCoord2f(0,0); glVertex3f(-1, 0,-1);
-	 glTexCoord2f(1,0); glVertex3f(-1, 0,+1);
-	 glTexCoord2f(1,1); glVertex3f(-1,+2,+1);
-	 glTexCoord2f(0,1); glVertex3f(-1,+2,-1);
-	 glEnd();
-	 //  Top
-	 glBindTexture(GL_TEXTURE_2D,car_texture[5]);
-	 glBegin(GL_QUADS);
-	 glNormal3f( 0,+1, 0);
-	 glTexCoord2f(0,0); glVertex3f(-1,+2,+1);
-	 glTexCoord2f(1,0); glVertex3f(+1,+2,+1);
-	 glTexCoord2f(1,1); glVertex3f(+1,+2,-1);
-	 glTexCoord2f(0,1); glVertex3f(-1,+2,-1);
-	 glEnd();
-	 //  Bottom
-	 glBindTexture(GL_TEXTURE_2D,car_texture[5]);
-	 glBegin(GL_QUADS);
-	 glNormal3f( 0,-1, 0);
-	 glTexCoord2f(0,0); glVertex3f(-1, 0,-1);
-	 glTexCoord2f(1,0); glVertex3f(+1, 0,-1);
-	 glTexCoord2f(1,1); glVertex3f(+1, 0,+1);
-	 glTexCoord2f(0,1); glVertex3f(-1, 0,+1);
-	 glEnd();
-	 //  Undo transformations
-	 glPopMatrix();
-	 glDisable(GL_TEXTURE_2D);
-	 }
-
-	 glPopMatrix();
-      
-         
+         police_lights_with_reflection(5,0.35,-0.45, 0.04,0.03,0.12);
+        
        }
       
       //  Surroundings
@@ -1313,17 +1340,20 @@ void display()
    if (light)
    {
       glWindowPos2i(5,25);
-      Print("Animation=%s  MovementPos=%.1f SpeedMPH=%.1f",mode?"FollowCar":"StayPut",speed,mph);
+      Print("Animation=%s  MovementPos=%.1f SpeedMPH=%.1f",mode?"FollowCar":"StayPut",movement_x,mph);
    }
-   if (mph < speed_limit)
+   if (mode)
    {
-      glWindowPos2i(5,45);
-      Print("WARNING: DO NOT EXCEED %d MPH",speed_limit);
-   }
-   else
-   {
-      glWindowPos2i(5,45);
-      Print("PULL OVER NOW!!!");
+      if (mph < speed_limit)
+      {
+         glWindowPos2i(5,45);
+         Print("WARNING: DO NOT EXCEED 100 MPH");
+      }
+      else
+      {
+         glWindowPos2i(5,45);
+         Print("PULL OVER NOW!!!  PoliceLightSwitch=%d  time=%.1f",police_light_switch,time);
+      }
    }
 //  Render the scene and make it visible
    ErrCheck("display");
@@ -1338,6 +1368,7 @@ void idle()
 {
    //  Elapsed time in seconds
    double t = glutGet(GLUT_ELAPSED_TIME)/1000.0;
+   time = t;
    zh = fmod(90*t,360.0);
    if (movement_x > movement_x_thresh)
    {
@@ -1347,6 +1378,7 @@ void idle()
    {
       movement_x = fmod(t*speed, movement_x_thresh);
    }
+   police_light_switch = fmod(time,2);
    tire_rot = t*(speed*200);
    //  Tell GLUT it is necessary to redisplay the scene
    glutPostRedisplay();
