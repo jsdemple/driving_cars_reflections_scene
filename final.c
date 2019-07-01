@@ -42,7 +42,7 @@ int zh        =  90;  // Light azimuth
 float ylight  =  10;  // Elevation of light
 int side      =   0;  // Two sided lighting mode
 //  Textures
-unsigned int texture[2]; // Texture names
+unsigned int texture[3]; // Texture names
 unsigned int car_texture[8];
 unsigned int building_texture[4];
 int box=1;	//  Draw sky
@@ -50,7 +50,7 @@ int sky[2];	//  Sky textures
 //  Movement
 double speed=10;
 double movement_x=0;
-double movement_x_thresh=56;
+double movement_x_thresh=70;  // 56
 double tire_rot=0;
 double to_mph_adjuster=3.0;
 double speed_limit=100;
@@ -102,10 +102,6 @@ static void car(double x, double y, double z,
 				      {front_axel_pos, axel_height, body_width+tire_protrusion},  //  passenger front
 				      {rear_axel_pos,  axel_height, -body_width-tire_protrusion},  //  driver rear
 	                             };
-   //  Other
-   const double mirror_width=0.2;
-   const double mirror_length=0.1;
-   const double mirror_height=0.1;
 
    /*  Begin Drawing Car  */
    //  Save Transformation
@@ -904,6 +900,125 @@ static void Vertex(double th,double ph)
 }
 
 /*
+ *  Draw a speed limit sign
+ */
+ static void speed_limit_sign(double x, double y, double z,
+                              double r, double d,
+                              double th)
+{
+   int i,k;
+   float street_light_color[] = {0.7,0.7,0.7};
+   //  DRAW BASE
+   glEnable(GL_TEXTURE_2D);
+   //  Save transformation
+   glPushMatrix();
+   //  Offset and scale
+   glTranslated(x,y,z);
+   glRotated(90,1,0,0);
+   glScaled(r,r,d);
+   //  Head & Tail
+   glColor3fv(street_light_color);
+   for (i=1;i>=-1;i-=2)
+   {
+      glBindTexture(GL_TEXTURE_2D,car_texture[5]);
+      glNormal3f(0,0,i);
+      glBegin(GL_TRIANGLE_FAN);
+      glTexCoord2f(0.5,0.5);
+      glVertex3f(0,0,i);
+      for (k=0;k<=360;k+=10)
+      {
+         glTexCoord2f(0.5*Cos(k)+0.5,0.5*Sin(k)+0.5);
+         glVertex3f(i*Cos(k),Sin(k),i);
+      }
+      glEnd();
+   }
+   //  Edge
+   glBindTexture(GL_TEXTURE_2D,car_texture[5]);
+   glColor3fv(street_light_color);
+   glBegin(GL_QUAD_STRIP);
+   for (k=0;k<=360;k+=10)
+   {
+      glNormal3f(Cos(k),Sin(k),0);
+      glTexCoord2f(0,0.5*k); glVertex3f(Cos(k),Sin(k),+1);
+      glTexCoord2f(1,0.5*k); glVertex3f(Cos(k),Sin(k),-1);
+   }
+   glEnd();
+   //  Undo transformations
+   glPopMatrix();
+   glDisable(GL_TEXTURE_2D);
+
+
+   //  DRAW SIGN
+   glEnable(GL_TEXTURE_2D);
+   //  Save transformation
+   glPushMatrix();
+   //  Offset and scale
+   glTranslated(x,y+d-(r),z);
+   glRotated(90,0,1,0);
+   glScaled(0.1,0.14,0.0001);
+   //  Front
+   glBindTexture(GL_TEXTURE_2D,texture[2]);
+   glBegin(GL_QUADS);
+   glColor3f(1,1,1);  
+   glNormal3f( 0, 0, 1);
+   glTexCoord2f(0,0); glVertex3f(-1, 0, 1);
+   glTexCoord2f(1,0); glVertex3f(+1, 0, 1);
+   glTexCoord2f(1,1); glVertex3f(+1,+2, 1);
+   glTexCoord2f(0,1); glVertex3f(-1,+2, 1);
+   glEnd();
+   //  Back
+   glColor3fv(street_light_color);
+   glBindTexture(GL_TEXTURE_2D,car_texture[5]);
+   glBegin(GL_QUADS);
+   glNormal3f( 0, 0,-1);
+   glTexCoord2f(0,0); glVertex3f(+1, 0,-1);
+   glTexCoord2f(1,0); glVertex3f(-1, 0,-1);
+   glTexCoord2f(1,1); glVertex3f(-1,+2,-1);
+   glTexCoord2f(0,1); glVertex3f(+1,+2,-1);
+   glEnd();
+   //  Right  
+   glBindTexture(GL_TEXTURE_2D,car_texture[5]);
+   glBegin(GL_QUADS);
+   glNormal3f(+1, 0, 0);
+   glTexCoord2f(0,0); glVertex3f(+1, 0,+1);
+   glTexCoord2f(1,0); glVertex3f(+1, 0,-1);
+   glTexCoord2f(1,1); glVertex3f(+1,+2,-1);
+   glTexCoord2f(0,1); glVertex3f(+1,+2,+1);
+   glEnd();
+   //  Left
+   glBindTexture(GL_TEXTURE_2D,car_texture[5]);
+   glBegin(GL_QUADS);
+   glNormal3f(-1, 0, 0);
+   glTexCoord2f(0,0); glVertex3f(-1, 0,-1);
+   glTexCoord2f(1,0); glVertex3f(-1, 0,+1);
+   glTexCoord2f(1,1); glVertex3f(-1,+2,+1);
+   glTexCoord2f(0,1); glVertex3f(-1,+2,-1);
+   glEnd();
+   //  Top
+   glBindTexture(GL_TEXTURE_2D,car_texture[5]);
+   glBegin(GL_QUADS);
+   glNormal3f( 0,+1, 0);
+   glTexCoord2f(0,0); glVertex3f(-1,+2,+1);
+   glTexCoord2f(1,0); glVertex3f(+1,+2,+1);
+   glTexCoord2f(1,1); glVertex3f(+1,+2,-1);
+   glTexCoord2f(0,1); glVertex3f(-1,+2,-1);
+   glEnd();
+   //  Bottom
+   glBindTexture(GL_TEXTURE_2D,car_texture[5]);
+   glBegin(GL_QUADS);
+   glNormal3f( 0,-1, 0);
+   glTexCoord2f(0,0); glVertex3f(-1, 0,-1);
+   glTexCoord2f(1,0); glVertex3f(+1, 0,-1);
+   glTexCoord2f(1,1); glVertex3f(+1, 0,+1);
+   glTexCoord2f(0,1); glVertex3f(-1, 0,+1);
+   glEnd();
+   //  Undo transformations
+   glPopMatrix();
+   glDisable(GL_TEXTURE_2D);
+
+}
+
+/*
  *  Draw a street light
  *     at (x,y,z)
  *     dimensions (dx,dy,dz)
@@ -1263,24 +1378,28 @@ void display()
        }
       
       //  Surroundings
+      cityBlock(-98+movement_x,0,0);  cityBlock(-98+movement_x,0,-12);  cityBlock(-98+movement_x,0,-24);
       cityBlock(-84+movement_x,0,0);  cityBlock(-84+movement_x,0,-12);  cityBlock(-84+movement_x,0,-24);
       cityBlock(-70+movement_x,0,0);  cityBlock(-70+movement_x,0,-12);  cityBlock(-70+movement_x,0,-24); 
       cityBlock(-56+movement_x,0,0);  cityBlock(-56+movement_x,0,-12);  cityBlock(-56+movement_x,0,-24); 
       cityBlock(-42+movement_x,0,0);  cityBlock(-42+movement_x,0,-12);  cityBlock(-42+movement_x,0,-24); 
       cityBlock(-28+movement_x,0,0);  cityBlock(-28+movement_x,0,-12);  cityBlock(-28+movement_x,0,-24); 
       cityBlock(-14+movement_x,0,0);  cityBlock(-14+movement_x,0,-12);  cityBlock(-14+movement_x,0,-24); 
-      cityBlock( 14+movement_x,0,0);  cityBlock( 14+movement_x,0,-12);  cityBlock( 14+movement_x,0,-24); 
       cityBlock(  0+movement_x,0,0);  cityBlock(  0+movement_x,0,-12);  cityBlock(  0+movement_x,0,-24); 
+      cityBlock( 14+movement_x,0,0);  cityBlock( 14+movement_x,0,-12);  cityBlock( 14+movement_x,0,-24); 
+      cityBlock( 28+movement_x,0,0);  cityBlock( 28+movement_x,0,-12);  cityBlock( 28+movement_x,0,-24); 
       
       //  Draw Water last or else reflections won't show on some waters
+      water(-98+movement_x,0,16, 0, rep);
       water(-84+movement_x,0,16, 0, rep);
       water(-70+movement_x,0,16, 0, rep);
       water(-56+movement_x,0,16, 0, rep);
       water(-42+movement_x,0,16, 0, rep);
       water(-28+movement_x,0,16, 0, rep);
       water(-14+movement_x,0,16, 0, rep);
-      water( 14+movement_x,0,16, 0, rep);
       water(  0+movement_x,0,16, 0, rep);
+      water( 14+movement_x,0,16, 0, rep);
+      water( 28+movement_x,0,16, 0, rep);
    }   else
    {
       //  Cars
@@ -1298,6 +1417,8 @@ void display()
       cityBlock(  0,0,0);  cityBlock(  0,0,-12);  cityBlock(  0,0,-24);  water(  0,0,16, 0, rep);
    }
    
+   speed_limit_sign(0,0,0, 0.01,0.5, 0);
+
    //  Fog
    /*  Fog Code borrowed from https://users.cs.jmu.edu/bernstdh/web/common/lectures/slides_opengl-fog.php  */
    if (fog)
@@ -1526,6 +1647,7 @@ int main(int argc,char* argv[])
    //  Load textures
    texture[0] = LoadTexBMP("asphalt.bmp");
    texture[1] = LoadTexBMP("sidewalk.bmp");
+   texture[2] = LoadTexBMP("speed_limit_sign.bmp");
    car_texture[0] = LoadTexBMP("car_side.bmp");
    car_texture[1] = LoadTexBMP("car_front.bmp");
    car_texture[2] = LoadTexBMP("car_rear.bmp");

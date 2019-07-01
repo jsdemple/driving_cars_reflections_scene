@@ -4,6 +4,7 @@ SPORTS CAR ON THE LAKEFRONT SCENE
 This scene features two animations, one where the viewer pans across the lake alongside an orange sportscar while the car and the city scene behind it can be seen in the water's reflection in the foreground. The other animation features a stationary view in relation to the scene and cars driving by on both sides. Press m to toggle between these animation modes.
 
 In both animations the vehicles' speed can be decreased/increased using s/S. Excessive speeds in the FollowCar mode may lead to run-ins with the law!
+
 Part of the challenge for this was making the FollowCar loop imperceptable. In order to do this I had to redraw almost all of my objects since I made some poor choices in how I drew them earlier. I found the most useful thing to be setting a global unit length and then having every dimension of every object (almost every) be in multiples of that unit length. This enabled me to create a cityBlock function that draws a block of 8 buildings, a street and a cross street, and street lights. The water in the foreground is the same length as these city blocks, however I found that I needed to draw all waters AFTER drawing all city blocks or I would have some water sections blocking the reflection of the buildings at far angles. 
 
 Reflections on the water are created by drawing each object that should be reflected once more, but with the y dimension inverted. The water object is slightly opaque making the reflection slightly washed out as it should be.
@@ -12,6 +13,7 @@ There is a fog mode available by pressing f. I would like to caveat this with th
 
 WHAT REMAINS TO BE DONE
 I am going to add a few more details to the city blocks and the possibly the car. If I have time I would like to clean up the StayPut loop to make it loop perfectly. 
+Fix yellow lines
 
 
 COMPILE
@@ -41,6 +43,7 @@ ACKNOWLEDGEMENTS
 - building1 from http://softwaremonster.info/?w=dryvit+stores+near
 - building2 from http://texturelib.com/#!/category/?path=/Textures/buildings/buildings
 - building3 from https://downloadtexture.com/textures-of-facades-of-office-buildings.html
+- speed limit sign texture from https://en.wikipedia.org/wiki/Speed_limits_in_the_United_States
 - Code for fog borrowed from from https://users.cs.jmu.edu/bernstdh/web/common/lectures/slides_opengl-fog.php
 - Reflection idea borrowed from https://www.opengl.org/archives/resources/code/samples/glut_examples/examples/dinoshade.c
 - This project borrows from many of the course examples including, but not necessary limited to ex: 10,13,14,15,19
