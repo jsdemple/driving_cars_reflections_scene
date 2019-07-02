@@ -584,6 +584,11 @@ static void police_lights_with_reflection(double x, double y, double z,
    glColor4fv(color);
    for (i=1;i>=-1;i-=2)
    {
+      if (i<0)
+      {
+         glEnable(GL_BLEND);
+         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+      }
       glNormal3f(0,0,i);
       glBegin(GL_TRIANGLE_FAN);
       glTexCoord2f(0.5,0.5);
@@ -595,6 +600,7 @@ static void police_lights_with_reflection(double x, double y, double z,
       }
       glEnd();
    }
+   glDisable(GL_BLEND);
    //  Undo transformations
    glPopMatrix();
 
