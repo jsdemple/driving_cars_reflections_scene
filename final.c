@@ -49,6 +49,7 @@ int box=1;	//  Draw sky
 int sky[2];	//  Sky textures
 //  Movement
 double speed=10;
+double default_speed=10;
 double movement_x=0;
 double movement_x_thresh=70;  // 56
 double tire_rot=0;
@@ -57,7 +58,7 @@ double speed_limit=100;
 int police_light_switch=0;
 int police_light_interval=5;
 double time;
-//  Mode: 0=PassingCars, 1=FollowCar
+//  Mode: 0=PassingCars, 1=FollowCar, 2=InspectCar
 int mode=1;
 //  Fog
 int fog=0;
@@ -552,6 +553,51 @@ static void police_lights_with_reflection(double x, double y, double z,
 {
    police_lights(x,y,z, dx,+dy,dz);
    police_lights(x,-y,z, dx,-dy,dz);
+}
+
+/*
+ *  Draw a Platform
+ */
+ static void platform(double x, double y, double z,
+                      double r, double d)
+{ 
+   int i,k;
+   float color[] = {0.2,0.2,0.2,0.5};
+   //  DRAW BASE
+   //  Save transformation
+   glPushMatrix();
+   //  Offset and scale
+   glTranslated(x,y,z);
+   glRotated(90,1,0,0);
+   glScaled(r,r,d);
+   //  Edge
+   glColor4fv(color);
+   glBegin(GL_QUAD_STRIP);
+   for (k=0;k<=360;k+=10)
+   {
+      glNormal3f(Cos(k),Sin(k),0);
+      glTexCoord2f(0,0.5*k); glVertex3f(Cos(k),Sin(k),+1);
+      glTexCoord2f(1,0.5*k); glVertex3f(Cos(k),Sin(k),-1);
+   }
+   glEnd();
+   //  Head & Tail
+   glColor4fv(color);
+   for (i=1;i>=-1;i-=2)
+   {
+      glNormal3f(0,0,i);
+      glBegin(GL_TRIANGLE_FAN);
+      glTexCoord2f(0.5,0.5);
+      glVertex3f(0,0,i);
+      for (k=0;k<=360;k+=10)
+      {
+         glTexCoord2f(0.5*Cos(k)+0.5,0.5*Sin(k)+0.5);
+         glVertex3f(i*Cos(k),Sin(k),i);
+      }
+      glEnd();
+   }
+   //  Undo transformations
+   glPopMatrix();
+
 }
 
 /*
@@ -1421,7 +1467,7 @@ void display()
       glDisable(GL_LIGHTING);
 
 
-   if (mode)
+   if (mode == 1)
    {
       //  Cars
       car_with_reflection(0,0,-0.45, 0.04,0.04,0.04, 180, tire_rot, 255,115, 10);  // orange car
@@ -1458,7 +1504,8 @@ void display()
       water(  0+movement_x,0,16, 0, rep);
       water( 14+movement_x,0,16, 0, rep);
       water( 28+movement_x,0,16, 0, rep);
-   }   else
+   }   
+   else if (mode == 0)
    {
       //  Cars
       car_with_reflection(-19+movement_x,0, 0.45, 0.04,0.04,0.04, 0  , tire_rot, 205,150, 10);  // yellow car
@@ -1470,9 +1517,18 @@ void display()
       car_with_reflection(-50+movement_x,0, 0.45, 0.04,0.04,0.04, 0  , tire_rot, 205,150,205);  // lavender car
       car_with_reflection(+52-movement_x,0,-0.45, 0.04,0.04,0.04, 180, tire_rot,  15,205,150);  // aqua car
       //  Surroundings
-      cityBlock(-14,0,0);  cityBlock(-14,0,-12);  cityBlock(-14,0,-24);  water(-14,0,16, 0, rep);
-      cityBlock( 14,0,0);  cityBlock( 14,0,-12);  cityBlock( 14,0,-24);  water( 14,0,16, 0, rep);
-      cityBlock(  0,0,0);  cityBlock(  0,0,-12);  cityBlock(  0,0,-24);  water(  0,0,16, 0, rep);
+      cityBlock(-14,0,0);  cityBlock(-14,0,-12);  cityBlock(-14,0,-24); 
+      cityBlock( 14,0,0);  cityBlock( 14,0,-12);  cityBlock( 14,0,-24); 
+      cityBlock(  0,0,0);  cityBlock(  0,0,-12);  cityBlock(  0,0,-24);  
+      //  Draw water last to avoid cutting off reflections
+      water(-14,0,16, 0, rep);
+      water( 14,0,16, 0, rep);
+      water(  0,0,16, 0, rep);
+   }
+   else 
+   {
+      car_with_reflection(0,0,0, 0.2,0.2,0.2, 180, tire_rot, 15,205,110);
+      platform(0,-1,0, 5,1);
    }
    
 
@@ -1610,7 +1666,11 @@ void key(unsigned char ch,int x,int y)
       th = ph = 25;
    //  Animation mode
    else if (ch == 'm' || ch == 'M')
-      mode = 1-mode;
+   {
+      mode = (mode+1)%3;
+      if (mode < 2) {speed = default_speed;}
+      else  speed = 0.0;
+   }
    //  Toggle axes
    else if (ch == 'x' || ch == 'X')
       axes = 1-axes;
