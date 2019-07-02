@@ -12,10 +12,7 @@ Reflections on the water are created by drawing each object that should be refle
 There is a fog mode available by pressing f. I would like to caveat this with the fact that on my machine (with my measly integrated graphics) the fog destroys my frame rate. I left the fog mode in because I am not sure if this would work with a decent graphics card or whether the problem is in my code. I think it really improves the scene by blending the further objects into the horizon more smoothly. I hope it works well on a machine with better capabilities.
 
 WHAT REMAINS TO BE DONE
-- Fix yellow lines
-- reflections for street sign and street light
 - mode where you can view car in detail
-- add details to city block
 
 
 COMPILE
@@ -31,7 +28,7 @@ OPERATE
  *  ESC        Exit
 
 TIME TO COMPLETE
-This took me roughly 36 hours
+This took me roughly 40 hours
 
 ACKNOWLEDGEMENTS
 - asphalt texture from https://www.123rf.com/photo_97376423_asphalt-background-asphalt-texture-black-road-surface-.html

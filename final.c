@@ -664,22 +664,14 @@ static void road(double x,double y,double z,
    //glPushMatrix();
    glColor3f(0.9,0.9,0);
    glTranslated(x,y,z-0.03);
-   //glRotated(90,1,0,0);
-   //glRotated(th,1,0,0);
-   //glScaled(dx,dy,1);
    glBegin(GL_QUADS);
    glVertex2f(+roadLen/2.0,roadWidth*+0.01/2.0);
    glVertex2f(-roadLen/2.0,roadWidth*+0.01/2.0);
    glVertex2f(-roadLen/2.0,roadWidth*-0.01/2.0);
    glVertex2f(+roadLen/2.0,roadWidth*-0.01/2.0);
    glEnd();
-   //glPopMatrix();
-   //glPushMatrix();
    glColor3f(0.9,0.9,0);
    glTranslated(x,y,z+0.03);
-   //glRotated(90,1,0,0);
-   //glRotated(th,1,0,0);
-   //glScaled(dx,dy,1);
    glBegin(GL_QUADS);
    glVertex2f(+roadLen/2.0,roadWidth*+0.01/2.0);
    glVertex2f(-roadLen/2.0,roadWidth*+0.01/2.0);
@@ -736,6 +728,29 @@ static void crossroad(double x,double y,double z,
    //  Undo transformations and textures
    glDisable(GL_POLYGON_OFFSET_FILL);
    glDisable(GL_TEXTURE_2D);
+
+   glColor3f(0.9,0.9,0.9);
+   glBegin(GL_QUADS);
+   glVertex2f(+roadWidth/2.0,roadLen*0.92/2.0);
+   glVertex2f(-roadWidth/2.0,roadLen*0.92/2.0);
+   glVertex2f(-roadWidth/2.0,roadLen*0.91/2.0);
+   glVertex2f(+roadWidth/2.0,roadLen*0.91/2.0);
+
+   glVertex2f(+roadWidth/2.0,roadLen*0.81/2.0);
+   glVertex2f(-roadWidth/2.0,roadLen*0.81/2.0);
+   glVertex2f(-roadWidth/2.0,roadLen*0.80/2.0);
+   glVertex2f(+roadWidth/2.0,roadLen*0.80/2.0);
+
+   glVertex2f(+roadWidth/2.0,-roadLen*0.92/2.0);
+   glVertex2f(-roadWidth/2.0,-roadLen*0.92/2.0);
+   glVertex2f(-roadWidth/2.0,-roadLen*0.91/2.0);
+   glVertex2f(+roadWidth/2.0,-roadLen*0.91/2.0);
+
+   glVertex2f(+roadWidth/2.0,-roadLen*0.81/2.0);
+   glVertex2f(-roadWidth/2.0,-roadLen*0.81/2.0);
+   glVertex2f(-roadWidth/2.0,-roadLen*0.80/2.0);
+   glVertex2f(+roadWidth/2.0,-roadLen*0.80/2.0);
+   glEnd();
    glPopMatrix();
  }
 
@@ -903,9 +918,17 @@ static void Vertex(double th,double ph)
  *  Draw a speed limit sign
  */
  static void speed_limit_sign(double x, double y, double z,
-                              double r, double d,
-                              double th)
+                              double r, double d, 
+                              double dy,
+			      double th)
 {
+
+   glPushMatrix();
+   glTranslated(x,y,z);
+   //glRotated(90,1,0,0);
+   glScaled(1,dy,1);
+
+
    int i,k;
    float street_light_color[] = {0.7,0.7,0.7};
    //  DRAW BASE
@@ -915,7 +938,7 @@ static void Vertex(double th,double ph)
    //  Offset and scale
    glTranslated(x,y,z);
    glRotated(90,1,0,0);
-   glScaled(r,r,d);
+   glScaled(r,r*dy,d);
    //  Head & Tail
    glColor3fv(street_light_color);
    for (i=1;i>=-1;i-=2)
@@ -1016,17 +1039,19 @@ static void Vertex(double th,double ph)
    glPopMatrix();
    glDisable(GL_TEXTURE_2D);
 
+   glPopMatrix();
+
 }
 
 /*
  *  Draw a speed limit sign
  */
- static void speed_limit_sign(double x, double y, double z,
-                              double r, double d,
-                              double th)
+ static void speed_limit_sign_with_reflection(double x, double y, double z,
+                                              double r, double d,
+                                              double th)
 {
-   speed_limit_sign(x,y,z, r,d, th);
-   speed_limit_sign(x,y,z, r,d, th);
+   speed_limit_sign(x,y,z, r,d,  1, th);
+   speed_limit_sign(x,y,z, r,d, -1, th);
 }
 
 /*
@@ -1037,8 +1062,14 @@ static void Vertex(double th,double ph)
  */
  static void street_light(double x, double y, double z,
                           double r, double d,
+			  double dy,
                           double th)
 {
+   glPushMatrix();
+   // Apply reflection here
+   glScaled(1,dy,1);
+
+
    y = 1+y;
    int i,k;
    float street_light_color[] = {0.2,0.2,0.2};
@@ -1212,6 +1243,21 @@ static void Vertex(double th,double ph)
    //  Undo transofrmations
    glPopMatrix();
 
+   glPopMatrix();
+}
+
+/*
+ *  Draw a street light with reflection
+ *     at (x,y,z)
+ *     dimensions (dx,dy,dz)
+ *     rotated th about the y axis
+ */
+ static void street_light_with_reflection(double x, double y, double z,
+                          double r, double d,
+                          double th)
+{
+   street_light(x,y,z, r,d,  1, th);
+   street_light(x,y,z, r,d, -1, th);
 }
 
 /*
@@ -1241,10 +1287,10 @@ static void cityBlock(double x, double y, double z)
    sidewalk(-1,0,-6, 0,      rep);
    
    //  Street Objects
-   street_light(-5.5,0,-1.25, 0.03,1, 0);
-   street_light(-1,0,-1.25, 0.03,1, 0);
-   street_light(4,0,-1.25, 0.03,1, 0);
-
+   street_light_with_reflection(-5.5,0,-1.25, 0.03,1, 0);
+   street_light_with_reflection(-1,0,-1.25, 0.03,1, 0);
+   street_light_with_reflection(4,0,-1.25, 0.03,1, 0);
+   speed_limit_sign_with_reflection(1,0,-0.6, 0.01,0.5, 0);
 
    glPopMatrix();
 }
@@ -1374,6 +1420,7 @@ void display()
    else
       glDisable(GL_LIGHTING);
 
+
    if (mode)
    {
       //  Cars
@@ -1428,7 +1475,6 @@ void display()
       cityBlock(  0,0,0);  cityBlock(  0,0,-12);  cityBlock(  0,0,-24);  water(  0,0,16, 0, rep);
    }
    
-   speed_limit_sign(0,0,0, 0.01,0.5, 0);
 
    //  Fog
    /*  Fog Code borrowed from https://users.cs.jmu.edu/bernstdh/web/common/lectures/slides_opengl-fog.php  */
@@ -1648,7 +1694,7 @@ int main(int argc,char* argv[])
    //  Request double buffered, true color window with Z buffering at 600x600
    glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
    glutInitWindowSize(1200,600);
-   glutCreateWindow("Joey Demple - hw3");
+   glutCreateWindow("Joey Demple");
    //  Set callbacks
    glutDisplayFunc(display);
    glutReshapeFunc(reshape);
