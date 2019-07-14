@@ -17,7 +17,7 @@ run: `make -f makefile`
  *  m          Cycle though animation mode (FollowCar, InspectCar, StayPut)
  *  s/S        Decrease/increase Speed of movement
  *  f/F	       Toggle Fog on/off
- *  []         Lower/rise light
+ *  [ , ]         Lower/rise light
  *  arrows     Change view angle
  *  PgDn/PgUp  Zoom in and out
  *  ESC        Exit
