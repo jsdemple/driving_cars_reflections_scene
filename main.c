@@ -1760,7 +1760,7 @@ int main(int argc,char* argv[])
    //  Request double buffered, true color window with Z buffering at 600x600
    glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
    glutInitWindowSize(1200,600);
-   glutCreateWindow("Joey Demple");
+   glutCreateWindow("Driving Cars with Reflection");
    //  Set callbacks
    glutDisplayFunc(display);
    glutReshapeFunc(reshape);
@@ -1768,25 +1768,26 @@ int main(int argc,char* argv[])
    glutKeyboardFunc(key);
    glutIdleFunc(idle);
    //  Load textures
-   texture[0] = LoadTexBMP("asphalt.bmp");
-   texture[1] = LoadTexBMP("sidewalk.bmp");
-   texture[2] = LoadTexBMP("speed_limit_sign.bmp");
-   car_texture[0] = LoadTexBMP("car_side.bmp");
-   car_texture[1] = LoadTexBMP("car_front.bmp");
-   car_texture[2] = LoadTexBMP("car_rear.bmp");
-   car_texture[3] = LoadTexBMP("car_underside.bmp");
-   car_texture[4] = LoadTexBMP("car_top.bmp");
-   car_texture[5] = LoadTexBMP("car_glass.bmp");
-   car_texture[6] = LoadTexBMP("car_wheel.bmp");
-   car_texture[7] = LoadTexBMP("car_tread.bmp");
-   building_texture[0] = LoadTexBMP("building0.bmp");
-   building_texture[1] = LoadTexBMP("building1.bmp");
-   building_texture[2] = LoadTexBMP("building2.bmp");
-   building_texture[3] = LoadTexBMP("building3.bmp");
-   sky[0] = LoadTexBMP("sky0.bmp");
-   sky[1] = LoadTexBMP("sky1.bmp");
+   texture[0] = LoadTexBMP("./textures/asphalt.bmp");
+   texture[1] = LoadTexBMP("./textures/sidewalk.bmp");
+   texture[2] = LoadTexBMP("./textures/speed_limit_sign.bmp");
+   car_texture[0] = LoadTexBMP("./textures/car_side.bmp");
+   car_texture[1] = LoadTexBMP("./textures/car_front.bmp");
+   car_texture[2] = LoadTexBMP("./textures/car_rear.bmp");
+   car_texture[3] = LoadTexBMP("./textures/car_underside.bmp");
+   car_texture[4] = LoadTexBMP("./textures/car_top.bmp");
+   car_texture[5] = LoadTexBMP("./textures/car_glass.bmp");
+   car_texture[6] = LoadTexBMP("./textures/car_wheel.bmp");
+   car_texture[7] = LoadTexBMP("./textures/car_tread.bmp");
+   building_texture[0] = LoadTexBMP("./textures/building0.bmp");
+   building_texture[1] = LoadTexBMP("./textures/building1.bmp");
+   building_texture[2] = LoadTexBMP("./textures/building2.bmp");
+   building_texture[3] = LoadTexBMP("./textures/building3.bmp");
+   sky[0] = LoadTexBMP("./textures/sky0.bmp");
+   sky[1] = LoadTexBMP("./textures/sky1.bmp");
    //  Pass control to GLUT so it can interact with the user
    ErrCheck("init");
    glutMainLoop();
    return 0;
 }
+

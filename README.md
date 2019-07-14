@@ -1,6 +1,4 @@
-Joey Demple 5229 - Final Project
-
-SPORTS CAR ON THE LAKEFRONT SCENE
+# SPORTS CAR ON THE LAKEFRONT SCENE
 This scene features three animations, one where the viewer pans across the lake alongside an orange sportscar while the car and the city scene behind it can be seen in the water's reflection in the foreground. Another animation features a stationary view in relation to the scene and cars driving by on both sides. The final mode features a closeup of the car on a reflective platform as if the car is on the polished show room floor. Press m to toggle between these animation modes.
 
 In all animations the vehicles' speed can be decreased/increased using s/S. Excessive speeds in the FollowCar mode may lead to run-ins with the law! The posted speed limit is 80 MPH as you can see on the side of the road, but you usually don't get the attention of the police until you exceed this limit by quite a bit.
@@ -12,10 +10,10 @@ Reflections on the water are created by drawing each object that should be refle
 There is a fog mode available by pressing f. I would like to caveat this with the fact that on my machine (with my measly integrated graphics) the fog destroys my frame rate. I left the fog mode in because I am not sure if this would work with a decent graphics card or whether the problem is in my code. I think it really improves the scene by blending the further objects into the horizon more smoothly. I hope it works well on a machine with better capabilities.
 
 
-COMPILE
+## COMPILE
 run: `make -f makefile`
 
-OPERATE
+## OPERATE
  *  m          Cycle though animation mode (FollowCar, InspectCar, StayPut)
  *  s/S        Decrease/increase Speed of movement
  *  f/F	       Toggle Fog on/off
@@ -24,10 +22,8 @@ OPERATE
  *  PgDn/PgUp  Zoom in and out
  *  ESC        Exit
 
-TIME TO COMPLETE
-This took me roughly 40 hours
-
-ACKNOWLEDGEMENTS
+## ACKNOWLEDGEMENTS
+- All textures that have been borrowed are being used under fair use
 - asphalt texture from https://www.123rf.com/photo_97376423_asphalt-background-asphalt-texture-black-road-surface-.html
 - sky map from https://learnopengl.com/Advanced-OpenGL/Cubemaps
 - sidewalk texture from http://ixiqi.co/image
@@ -42,6 +38,6 @@ ACKNOWLEDGEMENTS
 - speed limit sign texture from https://en.wikipedia.org/wiki/Speed_limits_in_the_United_States
 - Code for fog borrowed from from https://users.cs.jmu.edu/bernstdh/web/common/lectures/slides_opengl-fog.php
 - Reflection idea borrowed from https://www.opengl.org/archives/resources/code/samples/glut_examples/examples/dinoshade.c
-- This project borrows from many of the course examples including, but not necessary limited to ex: 10,13,14,15,19
+- This project borrows from many of the course examples from http://www.prinmath.com/csci5229/Su19/programs/index.html including, but not necessary limited to ex: 10,13,14,15,19
 
 

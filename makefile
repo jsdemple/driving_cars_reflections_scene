@@ -1,5 +1,6 @@
-# Joey Demple - final 
-EXE=final
+# CARS DRIVING ALONGSIDE THE WATER OPENGL SCENE
+# Author: Joey Demple
+EXE=main
 
 # Main target
 all: $(EXE)
@@ -43,7 +44,7 @@ CSCIx229.a:fatal.o loadtexbmp.o print.o project.o errcheck.o object.o
 	g++ -c $(CFLG) $<
 
 #  Link
-final:final.o CSCIx229.a
+main:main.o CSCIx229.a
 	gcc -O3 -o $@ $^   $(LIBS)
 
 #  Clean
